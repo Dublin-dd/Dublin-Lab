@@ -35,6 +35,14 @@ Workbench navigation and template entries use a selected set of [Heroicons v2.2.
 
 Workbench settings use flat groups with hairline dividers and monochrome shared switches. Local preferences save immediately; directory copying and the existing model settings dialog remain available through compact row actions.
 
+Dublin Lab adds GitHub Trending to the navigation rail, defaulting to weekly rankings with daily/monthly and language filters. Local cloning, Fork, independent copying and GitHub Pages publishing require explicit dialog confirmation; remote writes use the account shown on the page. The page reads the loopback-only GitHub owner in [web-app](../../bundle/web-app/README.md).
+
+Each repository card labels its author-supplied description as the project purpose. The optional Chinese translation switch is off initially; enabling it sends only public descriptions through the Host to [MyMemory](https://mymemory.translated.net/doc/spec.php), with three UI requests at a time. Machine translations preserve the original in a disclosure, and unavailable/quota-limited translations retain the original with a warning. Missing descriptions link users to the repository README rather than inventing a purpose. The idle camera island is a plain black pill with no visible text or decoration; its accessible label remains available to assistive technology. The appearance entry contains text only.
+
+The centered camera island requests video only after a click, mirrors a local live preview, and stops all tracks on preview click, page hiding, unmount, or a late permission result after cancellation. It does not record or upload. The right-hand appearance control offers light and charcoal styles through the existing theme service. Appearance metadata stays in `dublin.appearance.v1`; background images stay in local IndexedDB and accept PNG/JPEG/WebP/GIF up to 20 MB. The workspace and conversation share the image with independent 0–100% transparency controls; 0% shows it fully and 100% hides it. Older preferences initialize conversation transparency from the workspace value. The document panel and input card retain readable fills. Replacing or unmounting a background revokes its object URL. Browser storage clearing removes these preferences, not project files.
+
+The conversation clips the full workbench image canvas instead of fitting the image to its own pane. Both layers retain the same scale and position when navigating or resizing the window and sidebar; only their transparency differs.
+
 The root keeps the `main`, `rightbar`, `shell.bottom`, and `shell.overlay` slots. The hidden legacy sidebar keeps its settings portal mounted. Global-panel selection and the existing conversation continue to use `ctx.layout`; the workbench supplies the visible navigation.
 
 <a id="window-chrome-seat"></a>

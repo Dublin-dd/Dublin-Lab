@@ -72,9 +72,9 @@ export interface HeroShellProps {
 }
 
 /**
- * Greeting on the empty conversation. Local clock: before noon is morning, noon onward is afternoon.
+ * Personal welcome on the empty conversation, identical in both clock periods.
  * @param now - clock to read; defaults to the current local time.
- * @returns 「上午好，思敏」 or 「下午好，思敏」.
+ * @returns 「欢迎回来，Dublin」.
  */
 export function aipmGreeting(now = new Date()): string {
   return now.getHours() < 12 ? zh['hero.morning'] : zh['hero.afternoon']

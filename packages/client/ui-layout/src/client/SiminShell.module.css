@@ -1,4 +1,5 @@
 .shell {
+  position: relative; isolation: isolate;
   --surface: var(--dsw-alias-bg-base, #fff);
   --ink: var(--dsw-alias-label-primary, #0b0d19);
   --muted: var(--dsw-alias-label-secondary, #60616e);
@@ -18,6 +19,13 @@
 .shell button, .dialog button, .searchDialog button { cursor: pointer; font: inherit; }
 .shell button:disabled, .dialog button:disabled { cursor: wait; opacity: .6; }
 .shell button:focus-visible, .shell input:focus-visible, .shell select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.shell[data-dublin-style='dark'] { --surface: #151619; --soft: #111215; --ink: #e6e8ef; --muted: #9499a5; --line: #2b2d34; --hover: #202228; --accent: #a2b3dc; --accentSoft: #272d3b; --primary: #d9e0f1; --onPrimary: #171a22; --danger: #df9296; }
+.shell[data-dublin-style='dark'] .content { border: 1px solid #262830; background: radial-gradient(ellipse at 50% -20%, #20242e 0, #111215 55%); box-shadow: 0 18px 60px #0002; }
+.shell[data-dublin-style='dark'] .side { border-right: 1px solid #24262b; margin-right: 10px; }
+.shell[data-dublin-background='true'] .content { background: color-mix(in srgb,var(--soft) 74%,transparent); backdrop-filter: blur(12px); }
+.shell[data-dublin-background='true'] .side { background: color-mix(in srgb,var(--surface) 70%,transparent); backdrop-filter: blur(12px); }
+.background { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; pointer-events: none; }
+.header { position: relative; }
 .rail { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 22px 0 10px; min-height: 0; }
 .orb { display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle at 32% 20%, #c6d0ff, #8eacfc 44%, #5b7fe4); color: #fff; box-shadow: 0 3px 8px rgba(74,94,166,.07); }
 .orb svg { width: 20px; height: 20px; }
@@ -104,6 +112,10 @@
 .shell[data-simin-page='project'] .side { border-right: 1px solid var(--line); }
 .shell[data-simin-page='project'] .header { box-sizing: border-box; min-height: 64px; padding: 8px 20px; border-bottom: 1px solid var(--line); }
 .projectLayout:not(.chatOnly):not(.focusLayout) .chatPane { border-left: 1px solid var(--line); }
+.projectLayout { position: relative; isolation: isolate; overflow: hidden; }
+.chatBackground { position: absolute; top: 0; left: 0; max-width: none; object-fit: cover; object-position: center; visibility: hidden; z-index: -1; pointer-events: none; }
+.projectLayout[data-dublin-chat-background='true'] .chatPane { --dsh-conversation-background: transparent; }
+.projectLayout[data-dublin-chat-background='true'] .documentPane { background: var(--surface); }
 .overview .hint { padding: 14px 0; background: transparent; border-radius: 0; border-top: 1px solid var(--line); }
 .folderPath { padding-top: 16px; border-top: 1px solid var(--line); }
 :global([data-platform='darwin']) .shell[data-simin-page='project'] .header { min-height: 91px; padding-top: 35px; padding-bottom: 12px; }

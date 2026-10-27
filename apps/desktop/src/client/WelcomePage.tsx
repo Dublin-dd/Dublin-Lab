@@ -9,15 +9,6 @@ import type { WelcomeApi } from '../welcome-api.ts'
 type Page = 'entry' | 'key' | 'account'
 
 /**
- * Welcome headline. Local clock: before noon is morning, noon onward is afternoon.
- * @param now - clock to read; defaults to the current local time.
- * @returns 「上午好，思敏」 or 「下午好，思敏」.
- */
-function aipmGreeting(now = new Date()): string {
-  return now.getHours() < 12 ? '上午好，思敏' : '下午好，思敏'
-}
-
-/**
  * Render the standalone welcome flow using shell-owned operations and localized copy.
  * Clearing the account attempt returns the sign-in status page to the initial choices.
  * @param props.api - isolated preload API; no account credentials reach the renderer.
@@ -184,9 +175,9 @@ export function Welcome({ api }: { api: WelcomeApi }) {
     {expiryNotice && <Toast text={m.welcomeSessionExpired} onDone={() => { setExpiryNotice(false) }} />}
     <div className="titlebar" aria-hidden="true" />
     <main className="welcome" aria-labelledby={heading}>
-      <img className="brand" src="assets/welcome-brand.svg" alt={m.welcomeBrand} width="472" height="40" />
+      <div className="brand"><img src="assets/dublin-icon.png" alt="" width="40" height="40" />{m.welcomeBrand}</div>
       <div id="tagline" className="tagline" hidden={page !== 'entry'}>
-        <h1 id="welcome-heading">{aipmGreeting()}</h1>
+        <h1 id="welcome-heading">{m.welcomeTaglineBefore}{m.welcomeTaglineBrand}{m.welcomeTaglineAfter}</h1>
         <p id="welcome-description" hidden>{m.welcomeDescription}</p>
       </div>
       <form id="key-form" className="key-form" hidden={page !== 'key'} noValidate onSubmit={(event) => { void saveKey(event) }} aria-busy={busy}>

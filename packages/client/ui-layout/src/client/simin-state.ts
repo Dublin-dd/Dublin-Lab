@@ -7,7 +7,7 @@ export const SIMIN_OPEN_PROJECT_EVENT = 'aipm-open-project'
 /** Workspace adoption failure. */
 export const SIMIN_WORKSPACE_ERROR_EVENT = 'aipm-workspace-error'
 /** Available workbench pages. */
-export type SiminPage = 'home' | 'project' | 'documents' | 'templates' | 'trash' | 'settings'
+export type SiminPage = 'home' | 'project' | 'documents' | 'templates' | 'trash' | 'settings' | 'github'
 /** Persisted navigation. */
 export interface SiminView { project: string | null; file: string | null; page?: SiminPage; tab?: 'overview' | 'chat' | 'document' }
 /** Display preferences independent of document content. */
@@ -49,7 +49,7 @@ export function loadSiminView(): SiminView {
     const data = parsed as Record<string, unknown>
     const project = typeof data.project === 'string' && data.project ? data.project : null
     const file = project !== null && typeof data.file === 'string' ? data.file : null
-    const page = ['home', 'project', 'documents', 'templates', 'trash', 'settings'].find(item => item === data.page)
+    const page = ['home', 'project', 'documents', 'templates', 'trash', 'settings', 'github'].find(item => item === data.page)
     return { project, file, page: page as SiminPage | undefined ?? (project === null ? 'home' : 'project'), tab: data.tab === 'overview' || data.tab === 'document' ? data.tab : 'chat' }
   } catch (error: unknown) { void error; return emptySiminView() }
 }

@@ -163,6 +163,14 @@ describe('web-app runtime glue', () => {
         await routes.get('/aipm/projects')!(req, res)
         expect(res.statusCode).toBe(200)
         expect(JSON.parse(String(end.mock.calls[0]?.[0]))).toMatchObject({ projects: [{ name, path: join(root, name) }] })
+        expect(routes.has('/aipm/github')).toBe(true)
+        req.url = '/aipm/github?op=trending'
+        req.headers.origin = 'https://example.com'
+        const blocked = new ServerResponse(req)
+        const blockedEnd = vi.spyOn(blocked, 'end').mockImplementation(() => blocked)
+        await routes.get('/aipm/github')!(req, blocked)
+        expect(blocked.statusCode).toBe(403)
+        expect(JSON.parse(String(blockedEnd.mock.calls[0]?.[0]))).toEqual({ error: 'localOnly' })
       } finally { socket.destroy() }
       await ctx.fiber.dispose()
       expect(routes.size).toBe(0)

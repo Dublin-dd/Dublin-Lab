@@ -1,9 +1,11 @@
 /** Workbench-owned Chinese dictionary. */
+import { dublinZh, dublinEn } from './dublin-locales.ts'
 export const siminZh = {
+  ...dublinZh,
   stage: '本阶段', stageUnset: '尚未接入', stageHint: '流程尚未接入。阶段名称会在 Skill 接入后出现。', evidenceGaps: '待补充证据', noGaps: '暂无缺口', stageBusy: '正在写入…', stageConfirm: '确认本阶段', stageBlocked: '证据补齐后才能确认，并进入下一阶段。', stageSaved: '本阶段已确认。', productLabel: '产品',
-  'brand.localBuild': 'Simin Lab', brand: 'Simin Lab', avatar: 'S', personal: '个人工作台', home: '工作台', documents: '全部文档', templates: '模板', trash: '回收站', settings: '设置',
-  morning: '上午好，思敏', afternoon: '下午好，思敏', welcome: '每一个好想法，都从一个具体问题开始', foot: '先一起聊清楚，再把确定的结论留下来。',
-  projects: '我的项目', recent: '最近文档', space: '思敏的工作空间', oneLine: '一个项目，一条主线', create: '新建项目', search: '搜索内容', fromTemplate: '从模板开始',
+  'brand.localBuild': 'Dublin Lab', brand: 'Dublin Lab', avatar: 'D', personal: '个人工作台', home: '工作台', documents: '全部文档', templates: '模板', trash: '回收站', settings: '设置',
+  morning: '欢迎回来，Dublin', afternoon: '欢迎回来，Dublin', welcome: '每一个好想法，都从一个具体问题开始', foot: '先一起聊清楚，再把确定的结论留下来。',
+  projects: '我的项目', recent: '最近文档', space: '你的工作空间', oneLine: '一个项目，一条主线', create: '新建项目', search: '搜索内容', fromTemplate: '从模板开始',
   projectName: '项目名称', namePlaceholder: '给这个想法起个名字', idea: '最初的想法（可选）', ideaPlaceholder: '简单说说你想解决什么问题…', createHint: '创建一个空文件夹，从讨论开始，不预置文档或阶段',
   cancel: '取消', close: '关闭', confirm: '确认保存', save: '保存文档', busy: '正在处理…', retry: '重试', overview: '项目概览', chat: '对话', read: '文档', openSettings: '打开设置',
   noProjects: '从第一个想法开始', noProjectsHint: '新建一个项目，和助手一起把它聊清楚', noDocuments: '还没有文档', emptyProject: '这个项目从一段对话开始', emptyHint: '先聊清楚问题和已有信息，确认之后，再把结论留下来', continue: '继续讨论',
@@ -26,10 +28,11 @@ export const siminZh = {
 export type SiminKey = keyof typeof siminZh
 /** English workbench dictionary. */
 export const siminEn: Record<SiminKey, string> = {
+  ...dublinEn,
   stage: 'Current stage', stageUnset: 'Not connected', stageHint: 'Stage names appear after Skills are connected.', evidenceGaps: 'Missing evidence', noGaps: 'No gaps', stageBusy: 'Saving…', stageConfirm: 'Confirm stage', stageBlocked: 'Fill evidence gaps before confirming the next stage.', stageSaved: 'Stage confirmed.', productLabel: 'Product',
-  'brand.localBuild': 'Simin Lab', brand: 'Simin Lab', avatar: 'S', personal: 'Personal workbench', home: 'Workbench', documents: 'All documents', templates: 'Templates', trash: 'Trash', settings: 'Settings',
-  morning: 'Good morning, Simin', afternoon: 'Good afternoon, Simin', welcome: 'Every idea starts with a specific problem', foot: 'Talk it through, then keep the conclusions you confirm.',
-  projects: 'My projects', recent: 'Recent documents', space: 'Simin’s workspace', oneLine: 'One project, one thread', create: 'New project', search: 'Search', fromTemplate: 'Start from a template',
+  'brand.localBuild': 'Dublin Lab', brand: 'Dublin Lab', avatar: 'D', personal: 'Personal workbench', home: 'Workbench', documents: 'All documents', templates: 'Templates', trash: 'Trash', settings: 'Settings',
+  morning: 'Welcome back, Dublin', afternoon: 'Welcome back, Dublin', welcome: 'Every idea starts with a specific problem', foot: 'Talk it through, then keep the conclusions you confirm.',
+  projects: 'My projects', recent: 'Recent documents', space: 'Your workspace', oneLine: 'One project, one thread', create: 'New project', search: 'Search', fromTemplate: 'Start from a template',
   projectName: 'Project name', namePlaceholder: 'Name this idea', idea: 'Initial idea (optional)', ideaPlaceholder: 'What problem would you like to solve?', createHint: 'Start with an empty folder and a conversation',
   cancel: 'Cancel', close: 'Close', confirm: 'Confirm and save', save: 'Save document', busy: 'Working…', retry: 'Retry', overview: 'Overview', chat: 'Conversation', read: 'Document', openSettings: 'Open settings',
   noProjects: 'Start with your first idea', noProjectsHint: 'Create a project and talk it through', noDocuments: 'No documents yet', emptyProject: 'Start with a conversation', emptyHint: 'Discuss the problem and evidence before keeping conclusions', continue: 'Continue discussion',

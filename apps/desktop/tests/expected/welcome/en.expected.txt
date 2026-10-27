@@ -1,6 +1,6 @@
-DeepSeek Harness
-DeepSeek Harness
-Welcome to DeepSeek Harness
+Dublin Lab
+Dublin Lab
+Welcome to Dublin Lab
 Build potential. Explore intelligence.
 Sign in
 Add API Key

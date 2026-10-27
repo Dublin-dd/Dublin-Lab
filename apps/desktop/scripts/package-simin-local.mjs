@@ -1,17 +1,17 @@
-/** Build Simin's personal macOS bundle from the current local production packages. */
+/** Build Dublin's personal macOS bundle from the current local production packages. */
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { dirname, join, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { writeDesktopRuntime, verifyDesktopRuntime } from '../lib/types/runtime-tree.js'
 import { DESKTOP_HOST_PROTOCOL_VERSION } from '../lib/types/host-protocol.js'
 
 const root = fileURLToPath(new URL('../../..', import.meta.url))
 const desktop = join(root, 'apps/desktop')
-const build = join(desktop, '.desktop-build/simin-local')
+const build = join(desktop, '.desktop-build/dublin-local')
 const deployed = join(build, 'deployed')
-const bundle = join(root, 'dist/Simin Lab.app')
+const bundle = join(root, 'dist/Dublin Lab.app')
 const require = createRequire(join(desktop, 'package.json'))
 const electron = require('electron')
 const pnpmRoot = dirname(require.resolve('pnpm'))
@@ -100,7 +100,7 @@ function materializePackages(inputs, destination, extra = []) {
   return [...top.keys()]
 }
 
-if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new Error('Simin personal bundle requires this arm64 Mac')
+if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new Error('Dublin personal bundle requires this arm64 Mac')
 mkdirSync(build, { recursive: true })
 if (!process.argv.includes('--reuse-deploy')) {
   rmSync(deployed, { recursive: true, force: true })
@@ -111,6 +111,7 @@ mkdirSync(dirname(bundle), { recursive: true })
 execFileSync('/usr/bin/ditto', [resolve(dirname(electron), '../..'), bundle])
 const resources = join(bundle, 'Contents/Resources')
 rmSync(join(resources, 'default_app.asar'), { force: true })
+cpSync(join(desktop, 'resources/dublin.png'), join(resources, 'icon.png'))
 const app = join(resources, 'app')
 mkdirSync(app, { recursive: true })
 for (const directory of ['lib', 'renderer']) cpSync(join(desktop, directory), join(app, directory), { recursive: true })
@@ -126,6 +127,11 @@ const release = {
 }
 writeDesktopRuntime(dsh, release, shared, { platform: 'darwin', arch: 'arm64' })
 await verifyDesktopRuntime(dsh, manifest.version, { platform: 'darwin', arch: 'arm64' })
+// Import through the shipped Node runtime before signing; file inventories do
+// not detect unsupported syntax or unresolved runtime exports.
+execFileSync(electron, ['--expose-internals', '--input-type=module', '-e', `await import(${JSON.stringify(pathToFileURL(join(dsh, 'node_modules/@deepseek-ai/dsh-web-app/lib/index.js')).href)})`], {
+  env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' }, stdio: 'inherit',
+})
 materializePackages([], join(app, 'node_modules'), Object.keys(manifest.dependencies).map(name => [name, join(desktop, 'node_modules', name)]))
 cpSync(join(desktop, '.desktop-build/targets/mac-arm64/runtime/primary-runtime'), join(resources, 'runtime/primary-runtime'), { recursive: true })
 cpSync(join(desktop, '.desktop-build/targets/mac-arm64/runtime/office-skills'), join(resources, 'runtime/office-skills'), { recursive: true })
@@ -135,16 +141,20 @@ mkdirSync(join(resources, 'runtime/cli/bin'), { recursive: true })
 cpSync(join(desktop, 'cli/dsh'), join(resources, 'runtime/cli/bin/dsh'))
 cpSync(join(desktop, 'lib/command-manager-entry.js'), join(resources, 'runtime/cli/command-manager.js'))
 writeFileSync(join(resources, 'runtime/versions.json'), JSON.stringify({ schemaVersion: 1, node: release.nodeVersion, pnpm: release.pnpmVersion }))
-writeFileSync(join(app, 'simin-main.mjs'), `import { app } from 'electron'\nprocess.env.DSH_HOME = ${JSON.stringify(home)}\nprocess.env.DSH_DESKTOP_OPEN_DEVTOOLS = '0'\napp.setPath('userData', ${JSON.stringify(userData)})\nawait import('./lib/main.js')\n`)
-writeFileSync(join(app, 'package.json'), JSON.stringify({ ...manifest, main: 'simin-main.mjs', name: 'simin-workbench', productName: 'Simin Lab', dshDesktopAppId: 'local.simin.workbench', dependencies: manifest.dependencies }))
-renameSync(join(bundle, 'Contents/MacOS/Electron'), join(bundle, 'Contents/MacOS/Simin'))
+const githubCli = join(desktop, '.desktop-build/tools/gh')
+if (existsSync(githubCli)) cpSync(githubCli, join(resources, 'runtime/github'), { recursive: true })
+writeFileSync(join(app, 'dublin-main.mjs'), `import { app } from 'electron'\nimport { fileURLToPath } from 'node:url'\nprocess.env.DSH_HOME = ${JSON.stringify(home)}\nprocess.env.SIMIN_PROJECT_ROOT = ${JSON.stringify(join(root, 'projects'))}\nprocess.env.DSH_DESKTOP_OPEN_DEVTOOLS = '0'\n${existsSync(githubCli) ? "process.env.DUBLIN_GH_EXECUTABLE = fileURLToPath(new URL('../runtime/github/bin/gh', import.meta.url))\n" : ''}app.setPath('userData', ${JSON.stringify(userData)})\nawait import('./lib/main.js')\n`)
+writeFileSync(join(app, 'package.json'), JSON.stringify({ ...manifest, main: 'dublin-main.mjs', name: 'dublin-workbench', productName: 'Dublin Lab', dshDesktopAppId: 'local.dublin.workbench', dependencies: manifest.dependencies }))
+renameSync(join(bundle, 'Contents/MacOS/Electron'), join(bundle, 'Contents/MacOS/Dublin'))
 const plist = join(bundle, 'Contents/Info.plist')
-for (const [key, value] of Object.entries({ CFBundleIdentifier: 'local.simin.workbench', CFBundleName: 'Simin Lab', CFBundleDisplayName: 'Simin Lab', CFBundleExecutable: 'Simin', CFBundleShortVersionString: manifest.version, CFBundleVersion: '1', NSDesktopFolderUsageDescription: 'Simin Lab 需要访问桌面上的项目文件夹，以读取和保存你的项目文档。' })) {
+for (const [key, value] of Object.entries({ CFBundleLocalizations: ['en', 'zh_CN'], CFBundleURLTypes: [{ CFBundleURLName: 'Dublin Lab', CFBundleURLSchemes: ['dsh'], CFBundleTypeRole: 'Viewer' }], LSApplicationCategoryType: 'public.app-category.developer-tools' })) execFileSync('/usr/bin/plutil', ['-replace', key, '-json', JSON.stringify(value), plist])
+for (const [key, value] of Object.entries({ NSCameraUsageDescription: 'Dublin Lab 仅在你点击摄像头按钮后显示本地实时预览，不录制或上传。', NSMicrophoneUsageDescription: 'Dublin Lab 使用麦克风进行语音输入。' })) execFileSync('/usr/bin/plutil', ['-replace', key, '-json', JSON.stringify(value), plist])
+for (const [key, value] of Object.entries({ CFBundleIdentifier: 'local.dublin.workbench', CFBundleName: 'Dublin Lab', CFBundleDisplayName: 'Dublin Lab', CFBundleExecutable: 'Dublin', CFBundleShortVersionString: manifest.version, CFBundleVersion: '1', NSDesktopFolderUsageDescription: 'Dublin Lab 需要访问桌面上的项目文件夹，以读取和保存你的项目文档。' })) {
   execFileSync('/usr/bin/plutil', ['-replace', key, '-json', JSON.stringify(value), plist])
 }
-const icon = join(desktop, 'resources/simin.icns')
-if (existsSync(icon)) { cpSync(icon, join(resources, 'simin.icns')); execFileSync('/usr/bin/plutil', ['-replace', 'CFBundleIconFile', '-string', 'simin.icns', plist]) }
+const icon = join(desktop, 'resources/dublin.icns')
+if (existsSync(icon)) { cpSync(icon, join(resources, 'dublin.icns')); execFileSync('/usr/bin/plutil', ['-replace', 'CFBundleIconFile', '-string', 'dublin.icns', plist]) }
 execFileSync('/usr/bin/codesign', ['--force', '--deep', '--sign', '-', bundle], { stdio: 'inherit' })
 execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', bundle], { stdio: 'inherit' })
 execFileSync('/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister', ['-f', bundle])
-console.log(`Simin personal Mac application: ${bundle}`)
+console.log(`Dublin personal Mac application: ${bundle}`)

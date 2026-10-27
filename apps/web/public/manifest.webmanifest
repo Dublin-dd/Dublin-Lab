@@ -1,14 +1,14 @@
 {
-  "name": "DeepSeek Harness",
-  "short_name": "DSH",
+  "name": "Dublin Lab",
+  "short_name": "Dublin",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "assets/dublin-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

@@ -21,6 +21,7 @@ import { LayoutController } from './service.ts'
 import type { ShortcutCommandId } from '@deepseek-ai/dsh-client-shortcuts/client'
 import { en, zh } from './shortcut-locales.ts'
 import { ThemePresenter } from './theme-presenter.ts'
+import { DUBLIN_THEME_EVENT, loadDublinAppearance } from './dublin-appearance.ts'
 
 // Contract exports only (export-convergence rule: cross-package consumers
 // keep a symbol exported; test-only/package-internal symbols live off /src).
@@ -223,7 +224,14 @@ export function apply(ctx: ClientContext): void {
     const presenter = new ThemePresenter()
     presenter.apply(ctx.theme.getTheme())
     const off = ctx.on('theme/change', (snapshot) => { presenter.apply(snapshot) })
+    const selectTheme = (event: Event): void => {
+      const detail: unknown = (event as CustomEvent<unknown>).detail
+      if (detail === 'light' || detail === 'dark') ctx.theme.setTheme(detail)
+    }
+    window.addEventListener(DUBLIN_THEME_EVENT, selectTheme)
+    try { if (localStorage.getItem('dublin.appearance.v1') !== null) ctx.theme.setTheme(loadDublinAppearance().style) } catch { /* Storage may be unavailable. */ }
     return () => {
+      window.removeEventListener(DUBLIN_THEME_EVENT, selectTheme)
       off()
       presenter.dispose()
     }

@@ -18,14 +18,14 @@
   en: 3bd37b85139d2fa7
   zh: ba86c807eb83866e
 /deepseek-ai-dsh-web-app/use-this-package/local-workbench-behavior:
-  en: 198594b52aa00ea8
-  zh: cd144735bd30b281
+  en: cc3447b22f5b6c5a
+  zh: 3d6d510bf2f1c4c2
 /deepseek-ai-dsh-web-app/use-this-package/starting-the-web-gui:
   en: b7ab01cfe9fed40f
   zh: 23703ab7727c3ab5
 /deepseek-ai-dsh-web-app/use-this-package/configuration:
-  en: d3dd8d467020cca1
-  zh: f8eb99a6e237c886
+  en: c0d1b13bbdb090a5
+  zh: 84ff6c7a9c40ac82
 /deepseek-ai-dsh-web-app/use-this-package/listening-trust-and-public-deployments:
   en: a79add86cb73d966
   zh: 78b58259f98ed063
@@ -63,17 +63,17 @@
   en: e6febc53efe0f51d
   zh: 9177816a8678d65d
 /deepseek-ai-dsh-web-app/model-experience/harness-source-and-web-surface-context/what-the-model-sees:
-  en: 583592075e04687d
-  zh: 9defddfd77bab0f7
+  en: 9028a2c0fa0beec2
+  zh: 77bcc9aa170024ea
 /deepseek-ai-dsh-web-app/model-experience/harness-source-and-web-surface-context/token-effect:
-  en: 908fc84d6849a830
-  zh: 56fe5e418bab60ba
+  en: 57e85a7cb7f69bb7
+  zh: e8d9e874a1287af3
 /deepseek-ai-dsh-web-app/model-experience/harness-source-and-web-surface-context/kv-cache-effect:
   en: 1d7d87f54b20b563
   zh: d150a51615d278e8
 /deepseek-ai-dsh-web-app/known-limitations-and-deferred-work:
-  en: d6de1d07249ef3b0
-  zh: 49d01329256e2eb3
+  en: 26399e328c9b98ea
+  zh: ce6e34f4f7e65676
 /deepseek-ai-dsh-web-app/known-limitations-and-deferred-work/dev-note:
   en: 3f81b4f3beb74a0d
   zh: 2e377ca40822d093

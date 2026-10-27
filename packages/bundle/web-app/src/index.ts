@@ -15,7 +15,7 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
-import { networkInterfaces } from 'node:os'
+import { homedir, networkInterfaces } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
@@ -30,6 +30,8 @@ import type {} from '@deepseek-ai/dsh-shell-env'
 import { AIPM_PRODUCT_ROOT, handleAipmRequest, SIMIN_ROUTES } from './aipm-products.ts'
 import { installSiminProposals, SiminProposals } from './simin-proposals.ts'
 import { SiminFiles } from './simin-files.ts'
+import { DublinGithub } from './dublin-github.ts'
+import { installDublinBrowser } from './dublin-browser.ts'
 import { parsePublicUrl } from './public-url.ts'
 
 /** Stable Cordis plugin name. */
@@ -70,6 +72,14 @@ export interface Config {
   trustedHosts: string[]
   /** Project directory for the local workbench; relative paths resolve from the Host working directory. */
   projectRoot: string
+  /** GitHub CLI executable; credentials remain owned by the CLI, never returned to the renderer. */
+  githubCli: string
+  /** ego-browser executable for the fixed-action workbench browser tool. */
+  browserCli: string
+  /** Deadline in milliseconds for one browser CLI call, excluding user approval. */
+  browserTimeoutMs: number
+  /** Per-stream CLI output byte limit, including encoded screenshots. */
+  browserMaxOutputBytes: number
 }
 
 export const Config: z<Partial<Config>, Config> = z.object({
@@ -78,6 +88,10 @@ export const Config: z<Partial<Config>, Config> = z.object({
   surfaceContext: z.boolean().default(true),
   publicUrl: z.transform(z.string(), value => parsePublicUrl(value).href),
   trustedHosts: z.array(String).default([]),
+  githubCli: z.string().default(process.env.DUBLIN_GH_EXECUTABLE ?? 'gh'),
+  browserCli: z.string().default(join(homedir(), '.local/bin/ego-browser')),
+  browserTimeoutMs: z.number().default(45000),
+  browserMaxOutputBytes: z.number().default(8 * 1024 * 1024),
   projectRoot: z.transform(z.string(), (value) => {
     if (!value.trim()) throw new Error('web-app: projectRoot must not be empty')
     return resolve(value)
@@ -259,13 +273,18 @@ export function apply(ctx: Context, config: Config): void {
   ctx.provide(WEB_RUNTIME_SERVICE, runtime)
   const files = new SiminFiles(config.projectRoot)
   const proposals = new SiminProposals(files)
+  const github = new DublinGithub(join(config.projectRoot, '.github-repositories'), config.githubCli)
+  ctx.effect(() => () => github.dispose())
   installSiminProposals(ctx, proposals)
+  installDublinBrowser(ctx, config.projectRoot, {
+    executable: config.browserCli, timeoutMs: config.browserTimeoutMs, maxOutputBytes: config.browserMaxOutputBytes,
+  })
   for (const path of SIMIN_ROUTES) {
     ctx.effect(() => ctx.webServer.register({
       kind: 'exact',
       path,
       handler: async (req, res) => {
-        const handled = await handleAipmRequest(req, res, { files, proposals })
+        const handled = await handleAipmRequest(req, res, { files, proposals, github })
         if (!handled) {
           res.writeHead(404)
           res.end()

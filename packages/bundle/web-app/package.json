@@ -51,6 +51,7 @@
     }
   },
   "dependencies": {
+    "@deepseek-ai/dsh-attachment": "workspace:*",
     "@deepseek-ai/dsh-agent-instructions": "workspace:*",
     "@deepseek-ai/dsh-agent-preset": "workspace:*",
     "@deepseek-ai/dsh-agent-preset-registry": "workspace:*",
@@ -190,6 +191,7 @@
     "@deepseek-ai/dsh-system-prompt": "workspace:*"
   },
   "devDependencies": {
+    "@deepseek-ai/dsh-user-approval": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~",
     "@deepseek-ai/cordis-plugin-include": "workspace:~",
     "@deepseek-ai/cordis-plugin-loader": "workspace:~",

@@ -33,9 +33,17 @@ Start the GUI, open your browser, and start talking to the agent. The flags fine
 
 ### Local workbench behavior
 
-Simin’s loopback-only `/aipm/*` routes own real project folders, Markdown/text reads, content-version mutations, trash, full-text search, and retained save proposals. Documents default to the current checkout’s `projects/` root; `SIMIN_PROJECT_ROOT` in the shipped patch can select another writable directory; `.simin/` retains trash and proposal metadata. Existing `write` and `edit` tools wait for preview confirmation in these project workspaces. Other workspaces delegate normally. Shell and script tools are refused in Simin projects to prevent bypassing confirmation. This policy uses tool events and does not change the Agent loop. File operations are serialized locally and reject stale content versions; external editors can still race between version checking and an OS write.
+Dublin Lab’s loopback-only `/aipm/*` routes own real project folders, Markdown/text reads, content-version mutations, trash, full-text search, and retained save proposals. Documents default to the current checkout’s `projects/` root; `SIMIN_PROJECT_ROOT` in the shipped patch can select another writable directory; `.simin/` retains trash and proposal metadata. Existing `write` and `edit` tools wait for preview confirmation in these project workspaces. Other workspaces delegate normally. Shell and script tools are refused in Dublin Lab projects to prevent bypassing confirmation, including sessions whose historical cwd resolves through a legacy directory link. This policy uses tool events and does not change the Agent loop. File operations are serialized locally and reject stale content versions; external editors can still race between version checking and an OS write.
+
+In Standard mode, `dublin_browser` uses the installed ego-browser CLI for fixed `open`, `snapshot`, `screenshot`, `click`, `fill`, `press`, `scroll`, and `finish` actions. Start with `open`; navigation and interactions require one-shot approval through the existing approval UI. The tool never accepts scripts, shell commands, task-space ids, upload paths, or download destinations. Fill and press require an observed CSS selector; password, file, hidden, and password-autocomplete inputs are refused. Screenshots are bounded temporary PNGs committed through attachment storage, not arbitrary file reads. Web content is untrusted data. The adapter isolates each conversation's task space, does not claim user pages, and pauses that task after errors, timeouts, or cancellation rather than automatically retrying or creating another space. Finish closes its pages unless the user needs a retained result. Host teardown aborts and awaits CLI calls but does not close browser pages; a remote browser operation may outlive an interrupted CLI, so the user must inspect the browser before starting another task. The generic ego-browser skill's script examples do not grant shell access here.
 
 The Desktop profile opens the existing in-memory conversation search index on its first search. Web keeps conversation full-text search disabled unless a deployment patch enables it.
+
+Dublin's `/aipm/github` owner shares this loopback and origin fence. It reads GitHub's official Trending articles as text-only cards, caches each period/language for five minutes, and runs one user-confirmed repository job at a time. `githubCli` selects the GitHub CLI executable (`DUBLIN_GH_EXECUTABLE` or `gh` by default); the CLI owns credentials and device authorization, and no token is returned to the renderer. Local clones live under `projectRoot/.github-repositories/owner/repository`; symlink targets and existing destinations are refused. Cloning never installs dependencies or runs repository code.
+
+Translation lookups accept only a repository in the requested public Trending result, never caller-provided text. The owner sends English descriptions to MyMemory's public Chinese lookup endpoint in UTF-8 segments under 500 bytes, validates provider status and output, deduplicates active descriptions, limits active translation work to six descriptions, and keeps up to 200 results in memory. No private repository content, local files or credentials are sent. Translation limits and failures return localized warnings rather than invented summaries.
+
+Fork retains upstream association. Independent copying preserves branches, tags and history in a newly created public/private repository; an existing destination is never overwritten. If pushing fails after creation, the job links the partial repository without deleting it. Pages publishing accepts only repositories owned by the connected account, an explicit branch, and `/` or `/docs` with `index.html` or `index.md`; it changes that repository's public Pages source, not arbitrary backend hosting. A repository named `username.github.io` is the root homepage. Submitted Pages settings do not prove that the site is live. Jobs and downloads have bounded deadlines; Host teardown aborts and awaits active work. Jobs are retained only in memory and cannot resume after a Host restart.
 
 Run `dsh --profile web` for browser chat, model and settings management, and session history, using the same model access, tools, and safety defaults as other dsh surfaces. Startup prints a tokenized URL and normally opens the default browser; SSH sessions and `--no-open` require manual opening. You can change the port and allow extra hosts, but cannot bind all network interfaces. Remote access supports an advertised public HTTP(S) URL behind a prefix-stripping proxy. For one-shot command-line tasks, use `dsh-headless`.
 
@@ -64,6 +72,10 @@ Saved model selections override the composition default. The settings card accep
 | `publicUrl` | Unset | Advertised HTTP(S) application root; otherwise announce the listener's loopback URL |
 | `trustedHosts` | `[]` | Extra hosts allowed to reach the GUI from the network |
 | `projectRoot` | Checkout or runtime `projects/` | Workbench project directory; relative overrides resolve from the Host working directory |
+| `githubCli` | `DUBLIN_GH_EXECUTABLE` or `gh` | GitHub CLI executable for account and repository operations |
+| `browserCli` | `~/.local/bin/ego-browser` | Installed ego-browser CLI executable; does not depend on Finder's PATH |
+| `browserTimeoutMs` | `45000` | Deadline for each browser CLI call, excluding approval |
+| `browserMaxOutputBytes` | `8388608` | Per-stream CLI output limit, including encoded screenshots |
 
 The generated [configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-web-app) lists this runtime plugin's accepted fields and their JSDoc. The shipped composition inserts the `schedule` service row and the `ui-schedule` task page row, while the clock reading and the four reminder tools belong to the `standard`, `cordis`, and `ptc` presets. The `tool-subagent` and `tool-subagent-fork` rows in those presets deny the four tools, so a delegated child's scope never lists them.
 
@@ -151,9 +163,11 @@ Read these pages when you want to go deeper into the shared core, the browser re
 
 When `surfaceContext` is true, the `harness:source` section identifies the on-disk Harness implementation without claiming it is the working directory, and the `app:web-surface` global section (first-party order 10100, after reusable instructions) orients the model to the GUI: the advertised application URL (defined under Listening, trust, and public deployments above), the "this page" referent, the update contract (the reload receiver is always on; no-refresh reloads additionally need the `pnpm run dev:web` watcher), and the instruction not to start replacement servers. `DSH_WEB_URL` additionally appears in the managed bash environment with its description, resolved per invocation from the live server. When it is false, neither section nor the variable is registered.
 
+Project conversations identify the owner as Dublin and the product as Dublin Lab, retain reviewed document writes, and direct browser tasks to `dublin_browser` instead of shell scripts. The tool schema and results use the ordinary logged tool pipeline; screenshot content uses durable image attachment references. The replay expectation in `tests/expected/dublin-browser.expected.txt` pins the project prompt and shell-denial guidance.
+
 #### Token effect
 
-One source line and one prompt paragraph per session plus two managed-environment variable lines; constant per process.
+One source line and one prompt paragraph per session plus two managed-environment variable lines; constant per process. Project conversations add workbench guidance; the browser tool adds its schema and bounded webpage snapshots, while screenshots add image input only when requested.
 
 #### KV Cache effect
 
@@ -167,12 +181,14 @@ Source and Web sections follow first-party reusable instructions. Different chec
 These limits tell you what to expect in unusual setups — a source checkout, SSH sessions, or strict networks. They are current package constraints, not a general browser comparison or a task backlog.
 
 - **The frontend must be built** — a source checkout needs `pnpm run build` first; startup stops with a build hint when the dist is missing, and there is no source-serving fallback.
+- **Standalone Host bundles require decorator lowering** — the package-local tsdown configuration uses the same Typert plugin as the root Host build. Personal Desktop packaging imports the deployed Web module with its bundled Node runtime before signing.
 - **The listener has no TLS** — protect the external leg with a TLS-terminating proxy; an HTTP advertised root sends credentials without encryption.
 - **LAN addresses are sampled once at startup** — interface changes after boot are not re-advertised; the printed LAN URL always matches what was sampled.
 - **Only the handoff start is observable** — the GUI reports that the browser was asked to open, not that it actually opened; a later browser exit is never reported, and the printed URL is your manual fallback.
 - **SSH sessions keep the URL but skip the browser handoff** — without an advertised root the printed URL names the remote host's loopback endpoint; the SSH client or editor must expose and open the local forwarded address.
 - **`BROWSER` overrides only come from the environment** — a discovered `.env` cannot set `BROWSER`; only an inherited value can choose the executable for the automatic handoff.
 - **Binding all network interfaces is not supported** — `--host 0.0.0.0` is rejected at startup for safety; use the default loopback host.
+- **The browser adapter requires a locally installed ego-browser and an interactive approval channel.** It does not implement the generic skill's arbitrary scripts, uploads, downloads, popups, frames, or resuming user-owned spaces. PTC-only project conversations remain shell/script-restricted; use Standard mode. Failed browser tasks stay paused until the user starts a fresh conversation or restarts the Host after checking the browser.
 
 <a id="dev-note"></a>
 ### Dev Note

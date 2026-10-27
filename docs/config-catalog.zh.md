@@ -4129,7 +4129,7 @@ export interface WebRuntimeConfig {
 ## `@deepseek-ai/dsh-web-app`
 
 - `inject`: `webServer`
-- `source`: [`packages/bundle/web-app/src/index.ts:49`](../packages/bundle/web-app/src/index.ts)
+- `source`: [`packages/bundle/web-app/src/index.ts:51`](../packages/bundle/web-app/src/index.ts)
 
 ```ts config-catalog
 /** Plugin config: composed deployment settings plus per-invocation command-line values. */
@@ -4157,6 +4157,14 @@ export interface Config {
   trustedHosts: string[]
   /** Project directory for the local workbench; relative paths resolve from the Host working directory. */
   projectRoot: string
+  /** GitHub CLI executable; credentials remain owned by the CLI, never returned to the renderer. */
+  githubCli: string
+  /** ego-browser executable for the fixed-action workbench browser tool. */
+  browserCli: string
+  /** Deadline in milliseconds for one browser CLI call, excluding user approval. */
+  browserTimeoutMs: number
+  /** Per-stream CLI output byte limit, including encoded screenshots. */
+  browserMaxOutputBytes: number
 }
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-web-app -->

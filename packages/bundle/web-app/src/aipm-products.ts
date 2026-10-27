@@ -3,11 +3,12 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { fileURLToPath } from 'node:url'
 import { SiminFileError, SiminFiles } from './simin-files.ts'
 import { SiminProposals } from './simin-proposals.ts'
+import type { DublinGithub } from './dublin-github.ts'
 
 /** Default projects directory beside the source checkout or installed runtime. */
 export const AIPM_PRODUCT_ROOT = fileURLToPath(new URL('../../../../projects', import.meta.url))
 /** Exact endpoint list registered on the Host. */
-export const SIMIN_ROUTES = ['/aipm/product', '/aipm/projects', '/aipm/file', '/aipm/stage', '/aipm/state', '/aipm/mutate', '/aipm/decide', '/aipm/search']
+export const SIMIN_ROUTES = ['/aipm/product', '/aipm/projects', '/aipm/file', '/aipm/stage', '/aipm/state', '/aipm/mutate', '/aipm/decide', '/aipm/search', '/aipm/github']
 
 /**
  * Validate a project or document path component.
@@ -55,13 +56,20 @@ function localRequest(req: IncomingMessage): boolean {
  * @returns whether a Simin endpoint answered.
  */
 export async function handleAipmRequest(
-  req: IncomingMessage, res: ServerResponse, workbench: { files: SiminFiles; proposals: SiminProposals },
+  req: IncomingMessage, res: ServerResponse, workbench: { files: SiminFiles; proposals: SiminProposals; github?: DublinGithub },
 ): Promise<boolean> {
   const { files: siminFiles, proposals: siminProposals } = workbench
   const url = new URL(req.url ?? '/', 'http://127.0.0.1')
   if (!SIMIN_ROUTES.includes(url.pathname)) return false
   if (!localRequest(req)) { sendJson(res, 403, { error: 'localOnly' }); return true }
   try {
+    if (url.pathname === '/aipm/github') {
+      if (workbench.github === undefined) throw new SiminFileError('githubUnavailable')
+      if (req.method === 'GET') sendJson(res, 200, await workbench.github.read(url.searchParams))
+      else if (req.method === 'POST') sendJson(res, 202, workbench.github.write(await body(req)))
+      else sendJson(res, 405, { error: 'method' })
+      return true
+    }
     if (req.method === 'GET') {
       if (url.pathname === '/aipm/projects') sendJson(res, 200, { projects: await siminFiles.projects() })
       else if (url.pathname === '/aipm/state') sendJson(res, 200, {

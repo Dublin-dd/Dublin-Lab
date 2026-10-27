@@ -1,4 +1,4 @@
-/** Desktop media permissions exclude external pages, subframes and camera requests. */
+/** Desktop media permissions exclude external pages, subframes and mixed-device requests. */
 import type { Session, WebContents } from 'electron'
 import { afterEach, expect, it, vi } from 'vitest'
 import { installMicrophonePermissions } from '../src/microphone-permissions.ts'
@@ -14,7 +14,7 @@ function fixture(platform: NodeJS.Platform = 'darwin') {
   installMicrophonePermissions({ setPermissionCheckHandler, setPermissionRequestHandler }, () => primary)
   return { primary, check: setPermissionCheckHandler.mock.calls[0]![0]!, request: setPermissionRequestHandler.mock.calls[0]![0]! }
 }
-it('allows only audio checks from the owned primary application frame', () => {
+it('allows single-device checks only from the owned primary application frame', () => {
   const f = fixture(), details = { isMainFrame: true, mediaType: 'audio' as const }
   expect(f.check(f.primary, 'media', 'dsh-app://app', details)).toBe(true)
   expect(f.check(null, 'media', 'dsh-app://app', details)).toBe(false)
@@ -22,8 +22,18 @@ it('allows only audio checks from the owned primary application frame', () => {
   expect(f.check(f.primary, 'media', 'https://example.com', details)).toBe(false)
   expect(f.check(f.primary, 'media', 'invalid', details)).toBe(false)
   expect(f.check(f.primary, 'media', 'dsh-app://app', { ...details, isMainFrame: false })).toBe(false)
-  expect(f.check(f.primary, 'media', 'dsh-app://app', { ...details, mediaType: 'video' })).toBe(false)
+  expect(f.check(f.primary, 'media', 'dsh-app://app', { ...details, mediaType: 'video' })).toBe(true)
   expect(f.check(f.primary, 'clipboard-sanitized-write', 'dsh-app://app', details)).toBe(true)
+})
+it('asks macOS for camera authorization and denies external camera requests', async () => {
+  const f = fixture(), done = vi.fn()
+  f.request(f.primary, 'media', done, { isMainFrame: true, requestingUrl: 'dsh-app://app/', mediaTypes: ['video'] })
+  await vi.waitFor(() => { expect(done).toHaveBeenCalledWith(true) })
+  expect(access.askForMediaAccess).toHaveBeenCalledExactlyOnceWith('camera')
+  done.mockClear(); access.askForMediaAccess.mockClear()
+  f.request(f.primary, 'media', done, { isMainFrame: true, requestingUrl: 'https://example.com', mediaTypes: ['video'] })
+  expect(done).toHaveBeenCalledWith(false)
+  expect(access.askForMediaAccess).not.toHaveBeenCalled()
 })
 it.each(['not-determined', 'granted', 'denied', 'restricted', 'unknown'] as const)(
   'reports existing macOS microphone authorization for %s', (status) => {

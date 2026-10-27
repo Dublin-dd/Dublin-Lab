@@ -2408,6 +2408,9 @@ importers:
 
   packages/bundle/web-app:
     dependencies:
+      '@deepseek-ai/dsh-attachment':
+        specifier: workspace:*
+        version: link:../../attachment/attachment
       '@deepseek-ai/dsh-agent-instructions':
         specifier: workspace:*
         version: link:../../context/agent-instructions
@@ -2802,6 +2805,9 @@ importers:
         specifier: ^11.0.0
         version: 11.0.4
     devDependencies:
+      '@deepseek-ai/dsh-user-approval':
+        specifier: workspace:*
+        version: link:../../interaction/user-approval
       '@deepseek-ai/cordis':
         specifier: workspace:~
         version: link:../../../vendor/cordis

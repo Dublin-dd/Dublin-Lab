@@ -1,4 +1,4 @@
-# Simin Lab · AI 产品经理工作台
+# Dublin Lab · AI 产品经理工作台
 
 ![平台用途：把想法聊清楚，把判断留下来](docs/assets/readme/01-overview.png)
 

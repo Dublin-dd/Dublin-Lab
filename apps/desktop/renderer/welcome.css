@@ -94,12 +94,22 @@ body {
 }
 
 .brand {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--dsw-font-family-brand);
+  font-size: 30px;
+  font-weight: 500;
   flex: none;
   width: 100%;
   height: 40px;
   user-select: none;
   -webkit-user-drag: none;
+}
+
+.brand img {
+  border-radius: 10px;
 }
 
 .tagline {

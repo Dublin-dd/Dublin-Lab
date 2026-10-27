@@ -9,7 +9,7 @@ import { Context } from '@deepseek-ai/cordis'
 import Include from '@deepseek-ai/cordis-plugin-include'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import WebServer from '@deepseek-ai/dsh-host-webserver'
-import { apply, internals } from '../src/index.ts'
+import { apply, Config, internals } from '../src/index.ts'
 
 const contexts: Context[] = []
 const tempRoots: string[] = []
@@ -86,7 +86,8 @@ describe('web app browser startup', () => {
         rpc: object
       }
     }
-    globals.__dshWebAppApply = apply
+    // The fixture wrapper must apply the same defaults as the real plugin's exported schema.
+    globals.__dshWebAppApply = (ctx, config) => apply(ctx, new Config(config))
     globals.__dshWebServer = WebServer
     globals.__dshConnection = {
       authenticatedUrl: (baseUrl) => {

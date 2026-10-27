@@ -26,29 +26,30 @@ function quote(value: string): string { return `'${value.replaceAll("'", "'\\''"
  */
 export function prepareDevelopmentApp(options: DevelopmentAppOptions): string {
   const source = dirname(dirname(dirname(options.electron)))
-  const bundle = join(options.directory, 'Simin Lab.app')
-  const executable = join(bundle, 'Contents', 'MacOS', 'AIPM')
+  const bundle = join(options.directory, 'Dublin Lab.app')
+  const executable = join(bundle, 'Contents', 'MacOS', 'Dublin')
   const stamp = join(bundle, 'Contents', 'Resources', 'dsh-development.json')
   const launcher = developmentLauncher(options, bundle)
-  const icon = join(options.appRoot, 'resources', 'simin.icns')
+  const icon = join(options.appRoot, 'resources', 'dublin.icns')
   const iconHash = createHash('sha256').update(readFileSync(icon)).digest('hex')
-  const identity = JSON.stringify({ ...options, launcher, iconHash, plist: readFileSync(join(source, 'Contents', 'Info.plist'), 'utf8') })
+  const identity = JSON.stringify({ ...options, launcher, iconHash, cameraUsage: 'Dublin Lab camera preview', plist: readFileSync(join(source, 'Contents', 'Info.plist'), 'utf8') })
   if (!existsSync(stamp) || readFileSync(stamp, 'utf8') !== identity) {
     rmSync(bundle, { recursive: true, force: true })
     execFileSync('/usr/bin/ditto', [source, bundle])
     const plist = join(bundle, 'Contents', 'Info.plist')
     const values = {
-      CFBundleIdentifier: `com.deepseek.harness.dev.${createHash('sha256').update(options.appRoot).digest('hex').slice(0, 12)}`,
-      CFBundleName: 'Simin Lab',
-      CFBundleDisplayName: 'Simin Lab',
-      CFBundleExecutable: 'AIPM',
-      CFBundleIconFile: 'simin.icns',
-      CFBundleURLTypes: [{ CFBundleURLName: 'DeepSeek Harness', CFBundleURLSchemes: ['dsh'], CFBundleTypeRole: 'Viewer' }],
+      CFBundleIdentifier: `local.dublin.workbench.dev.${createHash('sha256').update(options.appRoot).digest('hex').slice(0, 12)}`,
+      CFBundleName: 'Dublin Lab',
+      CFBundleDisplayName: 'Dublin Lab',
+      CFBundleExecutable: 'Dublin',
+      CFBundleIconFile: 'dublin.icns',
+      NSCameraUsageDescription: 'Dublin Lab 使用摄像头显示本机实时预览，点击画面即可关闭；不会录制或上传。',
+      CFBundleURLTypes: [{ CFBundleURLName: 'Dublin Lab', CFBundleURLSchemes: ['dsh'], CFBundleTypeRole: 'Viewer' }],
     }
     for (const [key, value] of Object.entries(values)) {
       execFileSync('/usr/bin/plutil', ['-replace', key, '-json', JSON.stringify(value), plist])
     }
-    copyFileSync(icon, join(bundle, 'Contents', 'Resources', 'simin.icns'))
+    copyFileSync(icon, join(bundle, 'Contents', 'Resources', 'dublin.icns'))
     writeFileSync(executable, launcher, { mode: 0o755 })
     writeFileSync(stamp, identity, { mode: 0o600 })
     execFileSync('/usr/bin/codesign', ['--force', '--deep', '--sign', '-', bundle], { stdio: 'pipe' })
@@ -67,6 +68,7 @@ export function developmentLauncher(options: DevelopmentAppOptions, bundle: stri
   const environment = {
     DSH_HOME: options.home,
     DSH_DESKTOP_DEV_APP: '1',
+    DUBLIN_GH_EXECUTABLE: existsSync(join(options.appRoot, '.desktop-build', 'tools', 'gh', 'bin', 'gh')) ? join(options.appRoot, '.desktop-build', 'tools', 'gh', 'bin', 'gh') : 'gh',
     DSH_DESKTOP_HOST_INSPECT_PORT: String(options.hostPort),
     DSH_DESKTOP_OPEN_DEVTOOLS: options.openDevtools,
     ELECTRON_ENABLE_LOGGING: '1',

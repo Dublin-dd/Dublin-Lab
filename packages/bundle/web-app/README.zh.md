@@ -33,9 +33,17 @@ kind: "package-bundle"
 
 ### 本地工作台行为
 
-Simin 的 `/aipm/*` 接口仅接受本机请求，管理真实项目目录、Markdown/文本读取、内容版本操作、回收站、全文搜索及保存提案。正文默认保留在当前仓库的 `projects/` 下，随包补丁中的 `SIMIN_PROJECT_ROOT` 可以指定其他可写目录；`.simin/` 保存回收站和提案元数据。现有 `write`、`edit` 工具在这些项目工作区内等待预览确认，其他工作区照常委托执行。Simin 项目拒绝 shell 与脚本工具，避免绕过确认。该策略使用工具事件，不修改 Agent loop。文件操作在本进程内串行，并拒绝过期内容版本；外部编辑器仍可能在版本检查与系统写入之间产生竞争。
+Dublin Lab 的 `/aipm/*` 接口仅接受本机请求，管理真实项目目录、Markdown/文本读取、内容版本操作、回收站、全文搜索及保存提案。正文默认保留在当前仓库的 `projects/` 下，随包补丁中的 `SIMIN_PROJECT_ROOT` 可以指定其他可写目录；`.simin/` 保存回收站和提案元数据。现有 `write`、`edit` 工具在这些项目工作区内等待预览确认，其他工作区照常委托执行。Dublin Lab 项目拒绝 shell 与脚本工具，避免绕过确认；历史 cwd 通过旧目录链接指向当前项目的会话也适用。该策略使用工具事件，不修改 Agent loop。文件操作在本进程内串行，并拒绝过期内容版本；外部编辑器仍可能在版本检查与系统写入之间产生竞争。
+
+标准模式下，`dublin_browser` 通过本机 ego-browser CLI 提供固定的 `open`、`snapshot`、`screenshot`、`click`、`fill`、`press`、`scroll` 和 `finish` 操作。先执行 `open`；导航及交互操作通过现有授权界面逐次确认。工具不接受脚本、shell 命令、任务空间编号、上传路径或下载目标。填写和按键只接受已观察到的 CSS 选择器；拒绝密码、文件、隐藏及密码自动填充字段。截图仅接受受大小限制的临时 PNG，并通过附件存储持久化，不提供任意文件读取。网页内容是不可信数据。适配器按会话隔离任务空间，不接管用户页面；失败、超时或取消后暂停任务，不自动重试或新建空间。结束时关闭自己的页面，用户需要保留结果时除外。Host 退出时中止并等待 CLI 结束，但不关闭浏览器页面；CLI 被中断后，远端浏览器操作仍可能继续，因此用户应先检查浏览器再开始其他任务。通用 ego-browser skill 中的脚本示例不会在这里授予 shell 权限。
 
 Desktop profile 在首次搜索时打开现有的内存会话搜索索引。Web 的会话全文搜索保持关闭，部署补丁可自行启用。
+
+Dublin 的 `/aipm/github` owner 复用此 loopback 和来源栅栏。它将 GitHub 官方 Trending 文章解析为纯文本卡片，按时间范围与语言缓存五分钟，并且同时只执行一个经用户确认的仓库操作。`githubCli` 选择 GitHub CLI 可执行文件（默认使用 `DUBLIN_GH_EXECUTABLE` 或 `gh`）；凭据和设备授权归 CLI 管理，不向渲染进程返回 token。本地克隆保存在 `projectRoot/.github-repositories/owner/repository` 下，拒绝符号链接目标和已存在的目的地。克隆不安装依赖，也不运行仓库代码。
+
+翻译查询只接受所选公开 Trending 结果中的仓库，不接受调用方提供的文本。owner 将英文简介按不足 500 字节的 UTF-8 分段发送至 MyMemory 的公开中文查询接口，校验服务状态和结果，对活动简介请求去重，同时最多处理六条简介，并在内存中保留不超过 200 条结果。不发送私有仓库内容、本地文件或凭据。翻译限额和失败返回本地化提示，不编造摘要。
+
+Fork 保留上游关联。独立复制在新建的公开或私有仓库中保留分支、标签和历史，不覆盖已有目的地。若创建后推送失败，操作结果提供部分完成仓库的链接，不删除该仓库。Pages 发布只接受当前账号拥有的仓库、显式分支，以及包含 `index.html` 或 `index.md` 的 `/` 或 `/docs`；它修改该仓库的公开 Pages 来源，不托管任意后端。名为 `username.github.io` 的仓库对应根主页。提交 Pages 配置不证明网站已经上线。操作和下载有时限；Host 释放时中止并等待活动工作结束。操作仅保留在内存，Host 重启后不能恢复。
 
 运行 `dsh --profile web`，获得浏览器内的聊天、模型与设置管理以及会话历史，并与其他 dsh 表层共用同一套模型访问、工具与安全默认值。启动时会打印带 token 的 URL，通常还会在默认浏览器中打开；SSH 会话和 `--no-open` 需要手动打开。你可以更改端口并允许额外主机，但不能绑定所有网络接口。跨机访问支持在剥离前缀的代理之后公告一个公开的 HTTP(S) URL。一次性的命令行任务应使用 `dsh-headless`。
 
@@ -64,6 +72,10 @@ dsh --profile web --no-open --port 8080
 | `publicUrl` | 未设置 | 对外公告的 HTTP(S) 应用根；否则公告监听器的 loopback URL |
 | `trustedHosts` | `[]` | 允许从网络访问 GUI 的额外主机 |
 | `projectRoot` | 仓库或运行时的 `projects/` | 工作台项目目录；相对路径覆盖值从 Host 工作目录解析 |
+| `githubCli` | `DUBLIN_GH_EXECUTABLE` 或 `gh` | 账号与仓库操作使用的 GitHub CLI 可执行文件 |
+| `browserCli` | `~/.local/bin/ego-browser` | 本机 ego-browser CLI 可执行文件，不依赖 Finder 的 PATH |
+| `browserTimeoutMs` | `45000` | 每次浏览器 CLI 调用的超时时间，不含授权等待 |
+| `browserMaxOutputBytes` | `8388608` | 每路 CLI 输出字节上限，包含编码后的截图 |
 
 生成的[配置目录](../../../docs/config-catalog.zh.md#deepseek-aidsh-web-app)列出了本运行时插件接受的字段及其 JSDoc。随发行版交付的组合插入 `schedule` 服务行与 `ui-schedule` 任务页面行，时钟读数与四个提醒工具则属于 `standard`、`cordis` 与 `ptc` 三个 preset。这三个 preset 的 `tool-subagent` 与 `tool-subagent-fork` 两行都 deny 这四个工具，因此被委派子 agent 的作用域不会列出它们。
 
@@ -151,9 +163,11 @@ URL 行与浏览器交接都是就绪信号：监督方一观察到该行就发�
 
 当 `surfaceContext` 为 true 时，`harness:source` 段落标明磁盘上的 Harness 实现，但不会声称它就是工作目录；全局段落 `app:web-surface`（first-party 顺序 10100，位于可复用指令之后）则向模型说明 GUI：公告应用 URL（定义见上文「监听、信任与公开部署」）、「this page」指代什么、更新约定（重载接收端始终开启；无刷新重载还需要 `pnpm run dev:web` watcher），以及不要启动替代服务器的指令。`DSH_WEB_URL` 还会连同描述出现在受管 bash 环境中，每次调用时从运行中的服务器解析。当它为 false 时，这两个段落和该变量都不会注册。
 
+项目会话将所有者标为 Dublin、产品标为 Dublin Lab，保留文档修改审阅，并引导浏览器任务使用 `dublin_browser` 而非 shell 脚本。工具 schema 与结果进入普通的已记录工具流程；截图使用持久图片附件引用。`tests/expected/dublin-browser.expected.txt` 的回放预期固定了项目提示词及 shell 拒绝说明。
+
 #### Token 影响
 
-每个会话一行源码说明和一段提示词，外加两行受管环境变量；每个进程内保持恒定。
+每个会话一行源码说明和一段提示词，外加两行受管环境变量；每个进程内保持恒定。项目会话另含工作台指引；浏览器工具增加自身 schema 和受长度限制的网页快照，仅在请求截图时增加图片输入。
 
 #### KV Cache 影响
 
@@ -167,12 +181,14 @@ URL 行与浏览器交接都是就绪信号：监督方一观察到该行就发�
 这些限制告诉你在不常见的环境下会遇到什么——源码 checkout、SSH 会话或严格网络。它们是当前包约束，不是通用的浏览器对比或任务积压。
 
 - **前端必须已构建**——源码 checkout 需要先运行 `pnpm run build`；dist 缺失时启动会以构建提示停止，且没有从源码直接服务的回退路径。
+- **独立 Host 打包需要转换装饰器**——包内 tsdown 配置使用与根 Host 构建相同的 Typert 插件。个人 Desktop 打包会在签名前使用应用自带的 Node 运行环境导入已部署的 Web 模块。
 - **监听器不提供 TLS**——请用终止 TLS 的代理保护外部链路；HTTP 公告根会以明文发送凭据。
 - **LAN 地址只在启动时采样一次**——启动后的网卡变化不会重新公告；打印的 LAN URL 始终与采样结果一致。
 - **只能观察到交接的启动**——GUI 只报告浏览器被请求打开，而不是它确实打开了；之后的浏览器退出永远不会上报，打印的 URL 是你的手动回退路径。
 - **SSH 会话保留 URL 但跳过浏览器交接**——没有公告根时，打印的 URL 指向远端宿主机 loopback 端点；SSH 客户端或编辑器必须暴露并打开本地转发地址。
 - **`BROWSER` 覆盖只能来自环境**——被发现的 `.env` 不能设置 `BROWSER`；只有继承值能为自动交接选择可执行文件。
 - **不支持绑定所有网络接口**——出于安全考虑，`--host 0.0.0.0` 会在启动时被拒绝；请使用默认 loopback 主机。
+- **浏览器适配器需要本机安装 ego-browser，且存在交互式授权通道。** 它不提供通用 skill 的任意脚本、上传、下载、弹窗、框架或用户任务空间恢复操作。仅允许 PTC 的项目会话仍受 shell/脚本限制，请使用标准模式。浏览器任务失败后保持暂停；用户检查浏览器后，可以新建对话或重启 Host 再开始任务。
 
 <a id="dev-note"></a>
 ### 开发备注

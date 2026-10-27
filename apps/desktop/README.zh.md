@@ -492,8 +492,12 @@ node apps/desktop/node_modules/pnpm/bin/pnpm.mjs --dir apps/desktop run test:upd
 
 上线前 CDN 与容量决策见[桌面更新提案](../../.agents/notes/proposed/feature/2026-09-08-desktop-update-policy-and-installation.zh.md#cdn-and-capacity-qualification)。
 
-个人 Simin Lab macOS 应用使用由 `resources/simin-avatar.png` 生成的 `resources/simin.icns` 作为访达和 Dock 图标。开发启动器将图标摘要纳入应用缓存标识，本地个人打包脚本复制同一 ICNS 资源。
+个人 Dublin Lab macOS 应用使用由 `resources/dublin-avatar.png` 生成的 `resources/dublin.icns` 作为访达和 Dock 图标。开发启动器将图标摘要纳入应用缓存标识，本地个人打包脚本复制同一 ICNS 资源。
 
-本机个人打包命令为 `node apps/desktop/scripts/package-simin-local.mjs`，运行前先完成相关 TypeScript 和包级 bundle。脚本将 Electron、应用模块、依赖运行时及办公资源组装为 `dist/Simin Lab.app`，并应用 ad-hoc 签名；沿用此工作区的开发数据目录和项目文件。本机 Mac 构建不属于已公证的公开分发版本。
+工作台摄像头预览仅归属于主 `dsh-app://app` 框架，并请求 macOS 摄像头授权。开发应用与个人打包应用都声明摄像头用途；打包权限包含摄像头访问。拒绝外部页面、子框架和混合音频／视频请求。摄像头行为和本机持久化外观归 [ui-layout](../../packages/client/ui-layout/README.zh.md) 所有；GitHub 仓库操作归 [web-app](../../packages/bundle/web-app/README.zh.md#local-workbench-behavior) 所有。个人开发启动器选择 `.desktop-build/tools/gh/bin/gh`；本地打包脚本在该官方 GitHub CLI 分发包可用时将其包含在应用内，其他构建可配置 `githubCli` 或将 `gh` 安装到 PATH。
+
+在 macOS 上执行 `pnpm --filter @deepseek-ai/dsh-desktop run render:dublin-icon`，可从原始头像重新生成 ICNS、各平台 PNG、欢迎页头像和网页图标。桌面菜单、欢迎页和工作台在中英文中均使用 Dublin Lab；已有开发数据目录保持不变。
+
+本机个人打包命令为 `node apps/desktop/scripts/package-simin-local.mjs`，运行前先完成相关 TypeScript 和包级 bundle。脚本将 Electron、应用模块、依赖运行时及办公资源组装为 `dist/Dublin Lab.app`，并应用 ad-hoc 签名；沿用此工作区的开发数据目录和项目文件。本机 Mac 构建不属于已公证的公开分发版本。
 
 访达直接启动应用包内签名的 Electron 可执行文件。应用入口在启动前恢复本机数据路径；项目位于桌面，因此 macOS 可能询问桌面文件夹访问权限。

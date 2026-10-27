@@ -20,6 +20,10 @@ import { siminZh } from './simin-locales.ts'
 import type { SiminKey } from './simin-locales.ts'
 import { SiminIcon } from './SiminIcons.tsx'
 import css from './SiminShell.module.css'
+import { CameraIsland, AppearanceControl } from './DublinControls.tsx'
+import { useDublinAppearance } from './dublin-appearance.ts'
+import { useDublinBackgroundAlignment } from './dublin-background.ts'
+import { DublinGithub, GithubIcon } from './DublinGithub.tsx'
 
 type Copy = PropsLocale<'simin'>['t']
 type FileRow = { project: SiminProject; name: string; preview: string; modifiedAt: number }
@@ -73,6 +77,7 @@ function Reading({ text, t }: { text: string; t: Copy }) {
  * @returns the desktop workbench.
  */
 export function SiminShell({ chat, nativeSettings, t }: { chat: ReactNode; nativeSettings: ReactNode; t: Copy }) {
+  const appearance = useDublinAppearance()
   const [view, setView] = useState<SiminView>(() => loadSiminPreferences().remember ? loadSiminView() : { project: null, file: null, page: 'home' })
   const [prefs, setPrefs] = useState(loadSiminPreferences)
   const [snapshot, setSnapshot] = useState(initialSnapshot)
@@ -105,8 +110,11 @@ export function SiminShell({ chat, nativeSettings, t }: { chat: ReactNode; nativ
   const opening = useRef<string | null>(null)
   const poll = useRef<AbortController | null>(null)
   const previous = useRef<SiminSnapshot | null>(null)
+  const backgroundCanvas = useRef<HTMLDivElement>(null)
+  const chatBackground = useRef<HTMLImageElement>(null)
   const page = view.page ?? (view.project === null ? 'home' : 'project')
   const project = snapshot.projects.find(item => item.name === view.project)
+  useDublinBackgroundAlignment(backgroundCanvas, chatBackground, appearance.imageUrl !== null && page === 'project' && project !== undefined)
   const currentPath = useRef(project?.path)
   currentPath.current = project?.path
   const notify = (key: SiminKey): void => { setToast({ text: t(key), seq: Date.now() }) }
@@ -342,9 +350,11 @@ export function SiminShell({ chat, nativeSettings, t }: { chat: ReactNode; nativ
   ]
   const dialogKey: SiminKey = dialog?.kind === 'create' ? 'create' : dialog?.kind === 'rename' ? 'rename' : dialog?.kind === 'trash' ? 'remove' : dialog?.kind === 'purge' ? 'permanent' : dialog?.kind === 'template' ? `${dialog.template ?? 'idea'}Title` : dialog?.proposal?.before ? 'diff' : dialog?.kind === 'newDoc' && !previewing ? 'newDoc' : 'preview'
 
-  return <div className={`${css.shell} ${focus ? css.focused : ''}`} data-simin-page={page} data-reduced={prefs.reduced || undefined}>
+  return <div ref={backgroundCanvas} className={`${css.shell} ${focus ? css.focused : ''}`} data-simin-page={page} data-reduced={prefs.reduced || undefined} data-dublin-style={appearance.appearance.style} data-dublin-background={appearance.imageUrl !== null}>
+    {appearance.imageUrl !== null && <img className={css.background} src={appearance.imageUrl} alt="" style={{ opacity: 1 - appearance.appearance.transparency / 100 }} />}
     <nav className={css.rail} aria-label={t('home')}><span className={css.orb}><Star /></span>
       {([['home', 'workbench'], ['documents', 'documents'], ['templates', 'templates'], ['trash', 'trash']] as const).map(([entry, icon]) => <Tooltip key={entry} label={t(entry)} portal><button aria-label={t(entry)} className={`${css.railButton} ${page === entry ? css.selectedRail : ''}`} onClick={() => { navigate(entry) }}><SiminIcon name={icon} /></button></Tooltip>)}
+      <Tooltip label={t('github')} portal><button aria-label={t('github')} className={`${css.railButton} ${page === 'github' ? css.selectedRail : ''}`} onClick={() => { navigate('github') }}><GithubIcon /></button></Tooltip>
       <span className={css.railSpacer} />{iconButton('settings', () => { navigate('settings') }, <SiminIcon name="settings" />)}<span className={css.avatar}>{t('avatar')}</span>
     </nav>
     <aside className={`${css.side} ${navOpen ? css.sideOpen : ''}`}><div className={css.brand}>{t('brand')}<small>{t('personal')}</small></div>
@@ -354,15 +364,16 @@ export function SiminShell({ chat, nativeSettings, t }: { chat: ReactNode; nativ
     </aside>
     {navOpen && <button className={css.navMask} aria-label={t('close')} onClick={() => { setNavOpen(false) }} />}
     <main className={css.main}>
-      <header className={css.header}>{iconButton('navToggle', () => { setNavOpen(!navOpen) }, <IconPanelLeftOutlineRegular size={16} />)}{page === 'project' && <span className={css.breadcrumb}>{t('home')}<IconChevronRightOutlineRegular size={12} />{view.project}</span>}<span className={css.headerSpacer} />{focus ? button('exitFocus', () => { setFocus(false) }) : page !== 'project' && button('create', () => { begin({ kind: 'create' }) }, true, <IconPlusOutlineRegular size={13} />)}{button('search', () => { setSearchOpen(true); setSearchIndex(0) }, false, <IconSearchOutlineRegular size={13} />)}</header>
+      <header className={css.header}>{iconButton('navToggle', () => { setNavOpen(!navOpen) }, <IconPanelLeftOutlineRegular size={16} />)}{page === 'project' && <span className={css.breadcrumb}>{t('home')}<IconChevronRightOutlineRegular size={12} />{view.project}</span>}<CameraIsland t={t} /><span className={css.headerSpacer} />{focus && button('exitFocus', () => { setFocus(false) })}{button('search', () => { setSearchOpen(true); setSearchIndex(0) }, false, <IconSearchOutlineRegular size={13} />)}<AppearanceControl t={t} state={appearance} /></header>
       {loadError && <div className={css.notice} role="status">{t('loadingError')}{button('retry', () => { void refresh() })}</div>}
       <div className={css.content}>
-        {loading ? <div className={css.loading}><span className={css.spinner} /></div> : page === 'home' ? <div className={css.home}>
+        {page === 'github' ? <DublinGithub t={t} /> : loading ? <div className={css.loading}><span className={css.spinner} /></div> : page === 'home' ? <div className={css.home}>
           <span className={`${css.orb} ${css.welcomeOrb}`}><Star /></span><h1>{t(new Date().getHours() < 12 ? 'morning' : 'afternoon')}<span className={css.greetingEmoji} aria-hidden="true">👋</span></h1><p>{t('welcome')}</p>
           <section className={css.homeProjects}><div className={css.projectsHeading}><span>{t('projects')} <small>{snapshot.projects.length}</small></span><span>{iconButton('grid', () => { setListView(false) }, <IconBrowseOutlineRegular size={13} />)}{iconButton('list', () => { setListView(true) }, <IconPanelLeftOutlineRegular size={13} />)}</span></div>{snapshot.projects.length === 0 ? <div className={css.firstProject}><h2>{t('noProjects')}</h2><p>{t('noProjectsHint')}</p>{button('create', () => { begin({ kind: 'create' }) }, true)}</div> : <div className={listView ? css.projectList : css.projectGrid}>{snapshot.projects.map(item => <Folder key={item.path} project={item} t={t} onOpen={() => { openProject(item) }} />)}</div>}</section>
           <div className={css.quickActions}>{button('create', () => { begin({ kind: 'create' }) }, false, <IconPlusOutlineRegular size={13} />)}{button('documents', () => { navigate('documents') }, false, <IconDeliverDocRegular size={13} />)}{button('fromTemplate', () => { navigate('templates') }, false, <IconAgentPresetOutlineRegular size={13} />)}{button('search', () => { setSearchOpen(true) }, false, <IconSearchOutlineRegular size={13} />)}</div><p className={css.homeFoot}>{t('foot')}</p>
         </div> : page === 'documents' ? <div className={css.page}><h1>{t('documents')}</h1><div className={css.filters}><select aria-label={t('projects')} value={projectFilter} onChange={(event) => { setProjectFilter(event.target.value) }}><option value="">{t('allProjects')}</option>{snapshot.projects.map(item => <option key={item.path}>{item.name}</option>)}</select><input aria-label={t('search')} placeholder={t('filterPlaceholder')} value={query} onChange={(event) => { setQuery(event.target.value) }} /></div>{fileTable(filtered)}</div> : page === 'templates' ? <div className={`${css.page} ${css.templatePage}`}><h1>{t('templateTitle')}</h1><p className={css.subtitle}>{t('templateHint')}</p><div className={css.templates}>{templateButtons}</div><p className={css.templateNotice}>{t('templateNotice')}</p></div> : page === 'trash' ? <div className={css.page}><h1>{t('trash')}</h1><p className={css.subtitle}>{t('trashHint')}</p>{snapshot.trash.length === 0 ? <div className={css.emptyState}><IconTrashOutlineRegular size={28} /><h2>{t('trashEmpty')}</h2><p>{t('trashEmptyHint')}</p></div> : <div className={css.tableWrap}><table className={css.table}><thead><tr><th>{t('filename')}</th><th>{t('originalProject')}</th><th>{t('deleted')}</th><th>{t('actions')}</th></tr></thead><tbody>{snapshot.trash.map(item => <tr key={item.id}><td><button className={css.fileName} onClick={() => { begin({ kind: 'preview', markdown: item.markdown, file: item.file }) }}>{plain(item.file)}</button></td><td>{item.project}</td><td>{date(item.deletedAt)}</td><td><div className={css.rowActions}>{button('restore', () => { void restore(item) })}{iconButton('permanent', () => { begin({ kind: 'purge', deleted: item }) }, <IconTrashOutlineRegular size={13} />)}</div></td></tr>)}</tbody></table></div>}</div> : page === 'settings' ? settingsPage : project === undefined ? <div className={css.emptyState}><h2>{t('missing')}</h2>{button('back', () => { navigate('home') })}</div> : null}
-        <div className={`${css.projectLayout} ${view.tab === 'chat' ? css.chatOnly : ''} ${focus ? css.focusLayout : ''}`} hidden={page !== 'project' || project === undefined}>
+        <div className={`${css.projectLayout} ${view.tab === 'chat' ? css.chatOnly : ''} ${focus ? css.focusLayout : ''}`} data-dublin-chat-background={appearance.imageUrl !== null} hidden={page !== 'project' || project === undefined}>
+          {appearance.imageUrl !== null && <img ref={chatBackground} className={css.chatBackground} src={appearance.imageUrl} alt="" style={{ opacity: 1 - appearance.appearance.chatTransparency / 100 }} />}
           <section className={css.documentPane} hidden={view.tab === 'chat'}>
             {view.tab === 'overview' || view.file === null ? <div className={css.overview}><div className={css.overviewHeading}><span className={css.marker}><IconFolderCloseRegular size={17} /></span><h1>{project?.name}</h1></div><p className={css.subtitle}>{t('overviewHint')}</p>{project?.documents.length === 0 ? <div className={css.emptyState}><span className={css.orb}><Star /></span><h2>{t('emptyProject')}</h2><p>{t('emptyHint')}</p>{button('continue', () => { saveSiminView({ ...view, tab: 'chat' }) }, true)}</div> : <><h2>{t('evidence')}</h2>{project?.files.map(file => <button key={file.name} className={css.overviewDoc} onClick={() => { saveSiminView({ ...view, file: file.name, tab: 'document' }) }}><IconDeliverDocRegular size={17} /><div><h3>{plain(file.name)}</h3><p>{file.preview}</p></div><IconChevronRightOutlineRegular size={13} /></button>)}</>}<div className={css.hint}>{t('questionsHint')}</div><div className={css.folderPath}><span>{t('folder')}</span><code>{project?.path}</code>{iconButton('pathCopy', () => { void copy(project?.path ?? '') }, <IconCopyOutlineRegular size={13} />)}</div></div> : <><div className={css.docToolbar}><h1>{plain(view.file)}</h1><span className={css.headerSpacer} />{iconButton(source ? 'markdown' : 'source', () => { setSource(!source) }, <IconCodeOutlineRegular size={15} />)}{iconButton('copy', () => { void copy(document?.markdown ?? '') }, <IconCopyOutlineRegular size={15} />)}{iconButton(focus ? 'exitFocus' : 'focus', () => { setFocus(!focus) }, <IconFullscreenOutlineRegular size={15} />)}</div><div className={css.docActions}>{button('continue', () => { saveSiminView({ ...view, tab: 'chat' }) })}{button('quote', () => { if (project !== undefined && document !== null) { const selected = window.getSelection()?.toString(); draftToProject(project, selected ? `> ${selected}\n\n${view.file ?? ''}` : t('quotePrompt', { file: view.file ?? '' })) } })}{button('rename', () => { if (project !== undefined && view.file !== null && document !== null) begin({ kind: 'rename', project: project.name, file: view.file, version: document.version }) })}</div><article className={css.docBody}>{fileError && <p className={css.notice}>{t('fileError')}</p>}{document === null && !fileError ? <div className={css.loading}><span className={css.spinner} /></div> : source ? <pre>{document?.markdown}</pre> : <Reading text={document?.markdown ?? ''} t={t} />}</article></>}
           </section>

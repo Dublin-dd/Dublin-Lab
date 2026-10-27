@@ -74,7 +74,7 @@ The package occupies the root-scoped `main` key `conversation`. Its `main.conver
 
 A blank Session retains the header's leading and corner controls, including the right-sidebar opener, while hiding its title, actions, utilities, and View tabs. Selecting a Workspace creates the Session needed by these controls; the first message is not required. Without a selected Session, the strict header is absent; the resident header keeps a 40px window strip on macOS desktop that it owns as its drag row, and no empty vertical space on Web, Windows, or Linux. Sidebar entries retain their own data and execution prerequisites. A started Session header uses one row when fewer than two Views are available; the tab row reserves space only while rendered.
 
-The empty conversation shows Simin's greeting and brand mark without a preview badge. Send and stop controls use the theme's monochrome primary fill and contrasting foreground; disabled controls retain reduced opacity.
+The empty conversation shows “Welcome back, Dublin” and the brand mark without a preview badge. Its root uses `--dsh-conversation-background` when supplied by the embedding workbench, otherwise the theme's base background. Send and stop controls use the theme's monochrome primary fill and contrasting foreground; disabled controls retain reduced opacity.
 
 View selection is deterministic: a registered persisted selection wins, otherwise registered `chat` wins, otherwise no View renders. It never chooses the first registered View. Shell phase combines Session lifecycle with the active-target set; no target-specific snapshot is read by the shell.
 
