@@ -13,6 +13,6 @@
     <rect x="254" y="425" width="170" height="42" rx="21" fill="#282f40"/><text x="339" y="453" text-anchor="middle" fill="#d8def0" font-size="18">连接你的模型</text>
     <rect x="438" y="425" width="170" height="42" rx="21" fill="#282f40"/><text x="523" y="453" text-anchor="middle" fill="#d8def0" font-size="18">产品方法 Skills</text>
     <g transform="translate(860 140)"><rect width="475" height="340" rx="25" fill="#202633" stroke="#3b4254"/><rect x="25" y="25" width="425" height="50" rx="13" fill="#2b3345"/><circle cx="48" cy="50" r="5" fill="#ec666b"/><circle cx="65" cy="50" r="5" fill="#e6bc60"/><circle cx="82" cy="50" r="5" fill="#74be95"/><text x="425" y="56" text-anchor="end" font-size="15" fill="#b5becf">WORKBENCH</text><text x="30" y="130" fill="#eef1f8" font-size="24">一个问题，开启讨论</text><text x="30" y="172" fill="#aeb9cf" font-size="18">补充证据 · 审阅方案 · 保存文档</text><rect x="25" y="205" width="425" height="105" rx="15" fill="#171d29" stroke="#3b4254"/><path d="M48 230h210m-210 20h335m-335 20h276" fill="none" stroke="#596782" stroke-width="5" stroke-linecap="round"/></g>
-    <text x="70" y="552" font-size="17" fill="#7f8ba1">基于 Simin Lab 与 DeepSeek Harness 继续定制</text>
+    <text x="70" y="552" font-size="17" fill="#7f8ba1">基于 DeepSeek Harness</text>
   </g>
 </svg>

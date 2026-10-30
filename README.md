@@ -55,18 +55,62 @@ Dublin Lab 是面向个人使用的 AI 产品经理工作台。你可以围绕�
 
 左侧导航提供项目、文档、临时会话和 GitHub 等入口；密钥收纳位于左下角，主题和背景设置在“设置 → 外观”。
 
-以下截图来自独立演示配置，不含个人项目、聊天或真实密钥。
+以下截图由当前源码界面在独立演示配置中渲染。项目、GitHub 榜单、笔记、提醒、转写和摘要均为虚构示例，不表示真实热门排名或真实模型输出，也不包含个人内容、登录凭据或真实密钥。流程示意图单独标注。
 
-![Dublin Lab 工作台首页与顶部工具入口](docs/assets/readme/dublin-home.png)
+### 工作台首页
+
+项目入口和常用工具集中在同一工作空间，随时打开右侧面板。
+
+![Dublin Lab 首页与项目入口，使用演示项目](docs/assets/readme/dublin-home.png)
+
+### 项目文档与讨论流程
+
+在项目中阅读本地文档，使用专注阅读查看正文；需要补证据或修改时，再回到对话与审阅流程。
+
+![演示需求文档的专注阅读视图](docs/assets/readme/dublin-project.png)
+
+临时会话不要求先选项目，关闭后可从历史找回，也可以归入已有项目继续。下图是功能流程示意，不是对话界面截图。
+
+![临时会话、历史找回与项目文档工作的流程示意](docs/assets/readme/dublin-conversations.png)
+
+### GitHub 热门榜单
+
+按每日／本周／本月寻找项目，查看用途、切换中文简介，再选择本地克隆或导入自己的 GitHub。图中的仓库名与数字均为虚构示例。
+
+![GitHub 榜单界面，展示中文翻译和仓库操作入口；非真实热门排名](docs/assets/readme/dublin-github.png)
+
+### 待办事项与随手记
+
+右侧面板保留当前工作台，记录在全部项目间共用。
+
+| 待办事项 | 随手记 |
+|---|---|
+| 添加、编辑、勾选完成，切换未完成／已完成。 | 快速记录文字，自动保存，回看和编辑历史笔记。 |
+| ![待办面板，使用演示任务](docs/assets/readme/dublin-todos.png) | ![随手记面板，使用演示笔记](docs/assets/readme/dublin-notes.png) |
+
+### 定时任务与录音转写
+
+提醒可查看时间和重复规则；录音保存后，由你决定是否转写、整理或保存到随手记。图中的转写与摘要为演示文本，并非真实模型结果。
+
+| 定时任务 | 录音的转写与整理 |
+|---|---|
+| 查看、编辑、暂停和取消提醒，按规则执行。 | 查看时间戳与说话人标签，整理想法、会议或行动项。 |
+| ![定时任务面板，展示一次性与每周提醒的虚构示例](docs/assets/readme/dublin-reminders.png) | ![转写和内容整理面板，文字与摘要均为演示数据](docs/assets/readme/dublin-transcript.png) |
 
 <details>
-<summary>录音面板与密钥收纳界面</summary>
+<summary>查看录音来源与基本控制</summary>
 
 ![录音面板：本地保存、录音来源及手动转写设置](docs/assets/readme/dublin-recording.png)
 
-![黑色风格的密钥收纳编辑卡片，未填入真实密钥](docs/assets/readme/dublin-vault-dark.png)
-
 </details>
+
+### 密钥收纳与工作台外观
+
+密钥卡片默认遮罩，保存在本机加密文件中。外观设置提供浅色／黑色风格、本地背景图片，以及工作台和对话区独立的透明度控件。
+
+![密钥收纳的遮罩卡片，服务商和账号均为演示信息](docs/assets/readme/dublin-vault.png)
+
+![工作台外观设置，展示演示背景图片与两组透明度控件](docs/assets/readme/dublin-appearance.png)
 
 <a id="run"></a> <a id="run-from-source"></a> <a id="run-the-desktop-app"></a>
 

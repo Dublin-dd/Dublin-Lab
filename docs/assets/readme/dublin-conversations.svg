@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="600" viewBox="0 0 1440 600" role="img" aria-labelledby="title desc">
+<title id="title">临时会话与项目工作流 · 流程示意</title><desc id="desc">临时会话无需手选工作区，历史会保留，可归入项目继续。项目中讨论和审阅文档，再保存结论。</desc>
+<rect width="1440" height="600" rx="28" fill="#f6f7fb"/>
+<g font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif">
+<text x="64" y="82" fill="#151923" font-size="34" font-weight="600">先聊想法，也能回到项目继续</text><text x="64" y="122" fill="#697183" font-size="18">流程示意 · 非对话界面截图</text>
+<g fill="#fff" stroke="#dce0e8"><rect x="64" y="184" width="390" height="136" rx="20"/><rect x="524" y="184" width="390" height="136" rx="20"/><rect x="984" y="184" width="390" height="136" rx="20"/><rect x="64" y="382" width="390" height="136" rx="20"/><rect x="524" y="382" width="390" height="136" rx="20"/><rect x="984" y="382" width="390" height="136" rx="20"/></g>
+<g fill="#202636" font-size="25" font-weight="500"><text x="90" y="235">直接开启临时会话</text><text x="550" y="235">从历史找回会话</text><text x="1010" y="235">归入项目并继续</text><text x="90" y="433">本地项目与文档</text><text x="550" y="433">讨论、补证据与审阅</text><text x="1010" y="433">保存确定的结论</text></g>
+<g fill="#697183" font-size="18"><text x="90" y="280">无需手动选择工作区</text><text x="550" y="280">关闭或重启后仍可恢复</text><text x="1010" y="280">保留原会话，创建延续会话</text><text x="90" y="478">阅读 Markdown 与文本内容</text><text x="550" y="478">使用已配置、已授权的工具</text><text x="1010" y="478">关键修改由你确认</text></g>
+<g fill="none" stroke="#8c9bc5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M470 250h36m-9-9 9 9-9 9M930 250h36m-9-9 9 9-9 9M470 448h36m-9-9 9 9-9 9M930 448h36m-9-9 9 9-9 9"/></g>
+<text x="64" y="560" fill="#697183" font-size="17">“临时”指不绑定已有项目，不代表阅后即焚。浏览器与本地文件能力仍受工具配置和授权约束。</text>
+</g></svg>
