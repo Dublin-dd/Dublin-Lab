@@ -1,0 +1,17 @@
+.card { border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.card h3, .notice h3 { font-weight: 550; font-size: 14px; margin: 0; }
+.card p, .notice p { font-size: 13px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.card small, .card time, .notice time { color: var(--muted); font-size: 11px; }
+.card time { display: block; margin: 10px 0 14px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.row small { flex-shrink: 0; }
+.notices { position: fixed; right: 24px; bottom: 24px; z-index: 280; display: flex; flex-direction: column; gap: 12px; width: min(360px, calc(100vw - 48px)); max-height: 65vh; overflow-y: auto; -webkit-app-region: no-drag; }
+.notice { background: var(--surface); color: var(--ink); padding: 20px; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 40px #0002; }
+.notice > small { display: block; color: var(--accent); font-size: 11px; margin-bottom: 10px; }
+.notice button { display: block; margin-top: 14px; background: var(--ink); color: var(--surface); border: 0; border-radius: 8px; padding: 6px 12px; font-size: 12px; }
+.editor { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.editor label { display: flex; flex-direction: column; gap: 8px; font-size: 12px; margin-bottom: 14px; }
+.editor input, .editor textarea, .editor select { padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--soft); min-width: 0; }
+.editor textarea { min-height: 80px; resize: vertical; }
+.days { display: flex; flex-wrap: wrap; gap: 10px; }
+.days label { flex-direction: row; align-items: center; }

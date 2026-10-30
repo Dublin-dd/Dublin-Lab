@@ -31,7 +31,12 @@ kind: "package-bundle"
 
 启动 GUI、打开浏览器，然后开始与 agent（智能体）对话。flag 用于微调本次调用。
 
+<a id="local-workbench-behavior"></a>
 ### 本地工作台行为
+
+临时会话使用持久化 Session 和 `projectRoot/.dublin-chats` 下各自独立的 UUID 执行目录，不注册为用户项目。仅限本机的 `/aipm/temporary` 端点创建标准模式会话、不激活会话地列出历史、验证重开，并通过 `fork` 将空闲会话的已完成历史延续到已有项目；原日志和工作目录不变。浏览器和提醒工具识别这些私有目录，shell 仍被禁用，本地文件操作需要逐次确认解析后的路径。不绑定项目的系统提示固定于 `tests/expected/dublin-temporary.expected.txt`。
+
+直接提醒使用 `projectRoot` 下独立的 version-1 `.dublin-reminders.json`，不修改原有向 Session 投递后续消息的 Schedule 数据域，并复用其日历运算。支持相对延时、带显式偏移的单次时间、每日规则和 ISO 星期规则。日历规则保留创建或替换时采样的 Mac 时区。单一串行 owner 先原子替换存储，再发布通知；开始写入前遵守取消信号。恢复时每个重复提醒只补发最近一次；暂停的重复任务从下一个未来时间恢复。持久化未读通知保留送达时的名称和内容，直到用户确认。通知提交与原生发送之间崩溃可能漏掉系统弹窗，但应用内通知仍保留。存储失败会暂停调度，直到管理写入成功或重启；损坏的数据会拒绝恢复而不覆盖。退出时排空已接受的写入并取消计时器。
 
 Dublin Lab 的 `/aipm/*` 接口仅接受本机请求，管理真实项目目录、Markdown/文本读取、内容版本操作、回收站、全文搜索及保存提案。正文默认保留在当前仓库的 `projects/` 下，随包补丁中的 `SIMIN_PROJECT_ROOT` 可以指定其他可写目录；`.simin/` 保存回收站和提案元数据。现有 `write`、`edit` 工具在这些项目工作区内等待预览确认，其他工作区照常委托执行。Dublin Lab 项目拒绝 shell 与脚本工具，避免绕过确认；历史 cwd 通过旧目录链接指向当前项目的会话也适用。该策略使用工具事件，不修改 Agent loop。文件操作在本进程内串行，并拒绝过期内容版本；外部编辑器仍可能在版本检查与系统写入之间产生竞争。
 
@@ -161,9 +166,7 @@ URL 行与浏览器交接都是就绪信号：监督方一观察到该行就发�
 
 #### 模型看到什么
 
-当 `surfaceContext` 为 true 时，`harness:source` 段落标明磁盘上的 Harness 实现，但不会声称它就是工作目录；全局段落 `app:web-surface`（first-party 顺序 10100，位于可复用指令之后）则向模型说明 GUI：公告应用 URL（定义见上文「监听、信任与公开部署」）、「this page」指代什么、更新约定（重载接收端始终开启；无刷新重载还需要 `pnpm run dev:web` watcher），以及不要启动替代服务器的指令。`DSH_WEB_URL` 还会连同描述出现在受管 bash 环境中，每次调用时从运行中的服务器解析。当它为 false 时，这两个段落和该变量都不会注册。
-
-项目会话将所有者标为 Dublin、产品标为 Dublin Lab，保留文档修改审阅，并引导浏览器任务使用 `dublin_browser` 而非 shell 脚本。工具 schema 与结果进入普通的已记录工具流程；截图使用持久图片附件引用。`tests/expected/dublin-browser.expected.txt` 的回放预期固定了项目提示词及 shell 拒绝说明。
+`dublin_reminder` 工具在项目对话中创建、列出、替换、暂停、恢复、删除和确认本地直接提醒。工具 schema 和时间说明对模型可见且写入日志；包内 schema 快照为 [dublin-reminder.expected.txt](tests/expected/dublin-reminder.expected.txt)。到期提醒不调用模型，也不注入新的对话轮次。管理操作向请求增加工具 schema 和显式 JSON 结果；计时本身不消耗模型 token。 当 `surfaceContext` 为 true 时，`harness:source` 段落标明磁盘上的 Harness 实现，但不会声称它就是工作目录；全局段落 `app:web-surface`（first-party 顺序 10100，位于可复用指令之后）则向模型说明 GUI：公告应用 URL（定义见上文「监听、信任与公开部署」）、「this page」指代什么、更新约定（重载接收端始终开启；无刷新重载还需要 `pnpm run dev:web` watcher），以及不要启动替代服务器的指令。`DSH_WEB_URL` 还会连同描述出现在受管 bash 环境中，每次调用时从运行中的服务器解析。当它为 false 时，这两个段落和该变量都不会注册。 项目会话将所有者标为 Dublin、产品标为 Dublin Lab，保留文档修改审阅，并引导浏览器任务使用 `dublin_browser` 而非 shell 脚本。工具 schema 与结果进入普通的已记录工具流程；截图使用持久图片附件引用。`tests/expected/dublin-browser.expected.txt` 的回放预期固定了项目提示词及 shell 拒绝说明。
 
 #### Token 影响
 

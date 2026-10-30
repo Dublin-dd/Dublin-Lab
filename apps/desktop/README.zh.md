@@ -494,7 +494,13 @@ node apps/desktop/node_modules/pnpm/bin/pnpm.mjs --dir apps/desktop run test:upd
 
 个人 Dublin Lab macOS 应用使用由 `resources/dublin-avatar.png` 生成的 `resources/dublin.icns` 作为访达和 Dock 图标。开发启动器将图标摘要纳入应用缓存标识，本地个人打包脚本复制同一 ICNS 资源。
 
+Dublin 直接提醒通过经过校验的私有 Host IPC 送至保留引用的 Electron Notification 对象。送达不要求窗口可见，也不调用模型；点击会激活现有应用。macOS 权限和专注模式可能抑制系统弹窗，但持久化的应用内通知仍保留。关闭窗口保持 Host 运行；退出后计时停止，直到重新启动。退出时关闭保留的原生通知并释放监听器。
+
 工作台摄像头预览仅归属于主 `dsh-app://app` 框架，并请求 macOS 摄像头授权。开发应用与个人打包应用都声明摄像头用途；打包权限包含摄像头访问。拒绝外部页面、子框架和混合音频／视频请求。摄像头行为和本机持久化外观归 [ui-layout](../../packages/client/ui-layout/README.zh.md) 所有；GitHub 仓库操作归 [web-app](../../packages/bundle/web-app/README.zh.md#local-workbench-behavior) 所有。个人开发启动器选择 `.desktop-build/tools/gh/bin/gh`；本地打包脚本在该官方 GitHub CLI 分发包可用时将其包含在应用内，其他构建可配置 `githubCli` 或将 `gh` 安装到 PATH。
+
+Dublin 个人工具通过仅限主窗口顶层页面的 IPC 桥接提供能力。仅当前用户可访问的 `userData/dublin-tools` 目录保存持续写入的 WAV、JSON 文字稿和整理结果；`secrets.v1.enc` 使用 Electron safeStorage 加密保存密钥卡片及独立的转写设置。系统加密不可用时拒绝读写。本机 Mac 打包脚本将 `native/dublin-auth.swift` 编译到主程序旁，通过 LocalAuthentication 验证设备所有者，不在 JavaScript 中收集密码。缺少此辅助程序的源码运行需 Touch ID。明确复制后使用仅限当前设备的原生剪贴板，并标记为机密、临时内容，三十秒后有条件清除。密钥仅通过标准输入传入辅助程序；正常退出也会清除尚未被替换的已复制密钥。系统声音采集仅授权一次用户操作后的主窗口请求，使用 loopback，不保存视频。Mac 包声明麦克风和系统声音用途。退出检查包含进行中的录音，并在退出前完成已写入音频的保存。
+
+百炼请求仅在用户主动开始转写或整理时发生，使用独立配置并加密保存的凭据及所选北京／新加坡地址，不读取密钥卡片。个人构建使用百炼临时音频上传（有效期四十八小时），仍适用服务商保留政策。保存的转写任务 ID 支持中断后继续查询，无需重复上传。原生错误转换为本地化错误码，不包含路径、凭据或服务商响应正文。接口仍需使用真实账号验证后再依赖实际识别结果。
 
 在 macOS 上执行 `pnpm --filter @deepseek-ai/dsh-desktop run render:dublin-icon`，可从原始头像重新生成 ICNS、各平台 PNG、欢迎页头像和网页图标。桌面菜单、欢迎页和工作台在中英文中均使用 Dublin Lab；已有开发数据目录保持不变。
 

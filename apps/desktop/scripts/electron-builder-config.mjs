@@ -156,7 +156,8 @@ export function createElectronBuilderConfig(
       hardenedRuntime: true,
       extendInfo: {
         CFBundleLocalizations: ['en', 'zh_CN'],
-        NSMicrophoneUsageDescription: 'Dublin Lab uses your microphone to transcribe speech into message drafts.',
+        NSMicrophoneUsageDescription: 'Dublin Lab uses the microphone only when you start recording or voice input. Recordings are saved locally.',
+        NSAudioCaptureUsageDescription: 'Dublin Lab captures computer audio only when you start a mixed audio recording.',
         NSCameraUsageDescription: 'Dublin Lab uses your camera for a local live preview. Click the preview to stop. No recording or upload.',
       },
       entitlements: fileURLToPath(new URL('./macos-entitlements.plist', import.meta.url)),

@@ -1,7 +1,12 @@
 /** Keep conversation backgrounds on the workbench image canvas. */
 import { useLayoutEffect, type RefObject } from 'react'
 
-/** Align a clipped image with its outer canvas without changing either opacity. */
+/**
+ * Align a clipped image with its outer canvas without changing either opacity.
+ * @param canvas - full workbench image canvas.
+ * @param image - clipped conversation image layer.
+ * @param active - whether a shared background is currently visible.
+ */
 export function useDublinBackgroundAlignment(
   canvas: RefObject<HTMLElement | null>,
   image: RefObject<HTMLImageElement | null>,

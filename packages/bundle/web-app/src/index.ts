@@ -32,6 +32,8 @@ import { installSiminProposals, SiminProposals } from './simin-proposals.ts'
 import { SiminFiles } from './simin-files.ts'
 import { DublinGithub } from './dublin-github.ts'
 import { installDublinBrowser } from './dublin-browser.ts'
+import { DublinReminders, installDublinReminders } from './dublin-reminders.ts'
+import { DublinTemporarySessions } from './dublin-temporary.ts'
 import { parsePublicUrl } from './public-url.ts'
 
 /** Stable Cordis plugin name. */
@@ -274,6 +276,12 @@ export function apply(ctx: Context, config: Config): void {
   const files = new SiminFiles(config.projectRoot)
   const proposals = new SiminProposals(files)
   const github = new DublinGithub(join(config.projectRoot, '.github-repositories'), config.githubCli)
+  const reminders = new DublinReminders(join(config.projectRoot, '.dublin-reminders.json'), (task) => {
+    if (process.connected) process.send?.({ type: 'dublin-reminder', id: task.record.id,
+      title: task.record.title, message: task.record.prompt }, (error) => { if (error !== null) ctx.logger.warn(String(error)) })
+  }, (error) => { ctx.logger.warn(`Dublin reminders: ${String(error)}`) })
+  installDublinReminders(ctx, reminders, config.projectRoot)
+  const temporary = new DublinTemporarySessions(ctx, config.projectRoot)
   ctx.effect(() => () => github.dispose())
   installSiminProposals(ctx, proposals)
   installDublinBrowser(ctx, config.projectRoot, {
@@ -284,7 +292,7 @@ export function apply(ctx: Context, config: Config): void {
       kind: 'exact',
       path,
       handler: async (req, res) => {
-        const handled = await handleAipmRequest(req, res, { files, proposals, github })
+        const handled = await handleAipmRequest(req, res, { files, proposals, github, reminders, temporary })
         if (!handled) {
           res.writeHead(404)
           res.end()

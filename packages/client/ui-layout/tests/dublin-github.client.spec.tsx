@@ -33,7 +33,7 @@ it('offers Fork and independent copying, and writes only after confirmation', as
   expect(screen.getByLabelText(t('githubVisibility'))).toBeTruthy()
   expect(fetcher.mock.calls.every(([_url, options]) => options?.method !== 'POST')).toBe(true)
   fireEvent.click(screen.getByRole('button', { name: t('githubImportConfirm') }))
-  await waitFor(() => { expect(fetcher.mock.calls.some(([_url, options]) => options?.method === 'POST' && JSON.parse(String(options.body)).op === 'copy')).toBe(true) })
+  await waitFor(() => { expect(fetcher.mock.calls.some(([_url, options]) => options?.method === 'POST' && typeof options.body === 'string' && options.body.includes('\"op\":\"copy\"'))).toBe(true) })
 })
 it('translates on demand and preserves the original project purpose', async () => {
   const fetcher = fixture(); await screen.findByText('Sample project')

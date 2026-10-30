@@ -197,3 +197,28 @@ it('loads the tool through cordis.yml, requires one-shot approval, and keeps leg
   await bridge.fiber.dispose()
   expect(ctx.tools.get('dublin_browser')).toBeUndefined()
 })
+
+it('allows temporary chat tools while requiring explicit approval for every local file access', async () => {
+  const { ctx, agent } = await boot()
+  const cwd = join(root, 'projects/.dublin-chats/12345678-1234-1234-1234-123456789abc')
+  await mkdir(cwd, { recursive: true })
+  const session = Session.create(SessionId('temporary-fixture'), [], { ...agent.session.header,
+    id: SessionId('temporary-fixture'), cwd })
+  session.append('turn/start', { turn: 1 })
+  const temporaryAgent = { id: session.id, session, ctx } as Agent
+  await ctx.serial('agent/created', { agent: temporaryAgent, source: 'startup' })
+  let reads = 0
+  ctx.tools.register(Tools.defineTool({ name: 'read', description: 'fixture read', parameters: { path: { type: 'string', required: true } },
+    output: { schema: { type: 'string' }, render: (_args, value) => [{ type: 'text', text: value }] },
+    execute: async () => { reads++; return 'approved file' } }))
+  const invoke = (name: string, args: unknown) => ctx.tools.execute({ name, callId: 'temporary-test' as never,
+    arguments: args, signal: signal(), agent: temporaryAgent })
+  expect((await invoke('read', { path: '/user-selected.txt' })).isError).toBe(true)
+  expect(reads).toBe(0)
+  ctx.on('approval/request', async () => 'allowed-once')
+  expect((await invoke('read', { path: '/user-selected.txt' })).isError).not.toBe(true)
+  expect(reads).toBe(1)
+  expect((await invoke('dublin_browser', { action: 'open', url: 'https://example.com' })).isError).not.toBe(true)
+  const prompt = (await ctx.systemPrompt.assemble({ scope: temporaryAgent })).sections.find(section => section.name === 'app:simin-project')?.text
+  await expect((prompt ?? '') + '\n').toMatchFileSnapshot(fileURLToPath(new URL('./expected/dublin-temporary.expected.txt', import.meta.url)))
+})

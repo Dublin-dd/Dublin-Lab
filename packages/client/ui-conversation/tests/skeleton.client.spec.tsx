@@ -130,6 +130,8 @@ function mount(
     overlayTakeover?: boolean
     /** The session list summary's `blank` flag — independent of the snapshot's. */
     summaryBlank?: boolean
+    /** Private execution cwd for a projectless conversation. */
+    cwd?: string
     /** Drop the session's summary row entirely (a session the list has not caught up with). */
     omitSummaryRow?: boolean
     /** Classify the selected child as a subagent instead of an ordinary fork. */
@@ -152,7 +154,7 @@ function mount(
   }
   const childRow = {
     id: SID, displayTitle: 'Child', parentId: options.nestedSubagent === true ? parent : root,
-    cwd: '/projects/one', running: false, retainedBy: { mainView: 1 }, blank: options.summaryBlank ?? false, updatedAt: 3,
+    cwd: options.cwd ?? '/projects/one', running: false, retainedBy: { mainView: 1 }, blank: options.summaryBlank ?? false, updatedAt: 3,
     ...(options.summaryOrigin === undefined ? {} : { origin: options.summaryOrigin }),
   }
   const listed = options.omitSummaryRow !== true
@@ -688,6 +690,30 @@ describe('ConversationRoot resident composer', () => {
     // The agent-preset chip sits in the same row, for the same reason: both
     // choices are only open before the first message.
     expect(b.slotCalls).toContain('conversation.hero.agentPreset')
+  })
+  it('temporary chats can compose without a workspace picker or exposing their private directory', () => {
+    const b = mount(sessionSnapshotOf({ blank: true }), [], vi.fn(), {
+      cwd: '/projects/.dublin-chats/12345678-1234-1234-1234-123456789abc',
+    })
+    expect(b.view.queryByRole('button', { name: '选择工作区' })).toBeNull()
+    expect(b.slotCalls).not.toContain('conversation.hero.workspace')
+    expect(b.slotCalls).toContain('conversation.hero.agentPreset')
+    expect(b.view.container.textContent).not.toContain('12345678-1234-1234-1234-123456789abc')
+    const box = b.view.getByRole('textbox')
+    expect(box.getAttribute('contenteditable')).toBe('true')
+    expect(box.getAttribute('data-placeholder')).not.toBe('选择一个工作区开始')
+    act(() => { b.wiring.setDraft('temporary question') })
+    fireEvent.keyDown(box, { key: 'Enter' })
+    expect(b.sink).toHaveBeenCalledWith('temporary question', [], expect.any(String), expect.any(AbortSignal))
+  })
+  it('keeps model/provider blockers active for a temporary session without requiring a workspace', () => {
+    const b = mount(sessionSnapshotOf({ blank: true }), [], vi.fn(), {
+      cwd: '/projects/.dublin-chats/12345678-1234-1234-1234-123456789abc',
+      composerBlock: { reason: 'Model unavailable' },
+    })
+    expect(b.view.getByRole('textbox').getAttribute('contenteditable')).not.toBe('true')
+    expect(b.view.queryByRole('button', { name: '选择工作区' })).toBeNull()
+    expect(b.sink).not.toHaveBeenCalled()
   })
 
   it('prompt failure renders the promptError strip (ordinary failure, no transaction UI)', () => {

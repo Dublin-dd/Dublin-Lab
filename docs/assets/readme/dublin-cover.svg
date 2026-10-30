@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="620" viewBox="0 0 1440 620" role="img" aria-labelledby="title desc">
+  <title id="title">Dublin Lab · AI 产品经理工作台</title>
+  <desc id="desc">把想法聊清楚，把判断留下来。项目与对话、记录与提醒、录音与整理，在一个本地工作台中完成。</desc>
+  <defs><radialGradient id="orb" cx="30%" cy="20%"><stop stop-color="#c6d0ff"/><stop offset=".5" stop-color="#8eacfc"/><stop offset="1" stop-color="#5b7fe4"/></radialGradient><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#11131a"/><stop offset="1" stop-color="#1e2330"/></linearGradient></defs>
+  <rect width="1440" height="620" rx="28" fill="url(#bg)"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif">
+    <circle cx="92" cy="80" r="26" fill="url(#orb)"/><path d="m92 60 5 15 15 5-15 5-5 15-5-15-15-5 15-5z" fill="white"/>
+    <text x="136" y="91" font-size="30" font-weight="600" fill="#f2f4fa">Dublin Lab</text>
+    <text x="68" y="214" font-size="54" font-weight="600" fill="#f2f4fa">AI 产品经理工作台</text>
+    <text x="70" y="282" font-size="29" fill="#b5becf">把想法聊清楚，把判断留下来。</text>
+    <text x="70" y="355" font-size="22" fill="#8e99ae">项目与对话 · 记录与提醒 · 录音与整理</text>
+    <rect x="70" y="425" width="170" height="42" rx="21" fill="#282f40"/><text x="155" y="453" text-anchor="middle" fill="#d8def0" font-size="18">文档留在本机</text>
+    <rect x="254" y="425" width="170" height="42" rx="21" fill="#282f40"/><text x="339" y="453" text-anchor="middle" fill="#d8def0" font-size="18">连接你的模型</text>
+    <rect x="438" y="425" width="170" height="42" rx="21" fill="#282f40"/><text x="523" y="453" text-anchor="middle" fill="#d8def0" font-size="18">产品方法 Skills</text>
+    <g transform="translate(860 140)"><rect width="475" height="340" rx="25" fill="#202633" stroke="#3b4254"/><rect x="25" y="25" width="425" height="50" rx="13" fill="#2b3345"/><circle cx="48" cy="50" r="5" fill="#ec666b"/><circle cx="65" cy="50" r="5" fill="#e6bc60"/><circle cx="82" cy="50" r="5" fill="#74be95"/><text x="425" y="56" text-anchor="end" font-size="15" fill="#b5becf">WORKBENCH</text><text x="30" y="130" fill="#eef1f8" font-size="24">一个问题，开启讨论</text><text x="30" y="172" fill="#aeb9cf" font-size="18">补充证据 · 审阅方案 · 保存文档</text><rect x="25" y="205" width="425" height="105" rx="15" fill="#171d29" stroke="#3b4254"/><path d="M48 230h210m-210 20h335m-335 20h276" fill="none" stroke="#596782" stroke-width="5" stroke-linecap="round"/></g>
+    <text x="70" y="552" font-size="17" fill="#7f8ba1">基于 Simin Lab 与 DeepSeek Harness 继续定制</text>
+  </g>
+</svg>

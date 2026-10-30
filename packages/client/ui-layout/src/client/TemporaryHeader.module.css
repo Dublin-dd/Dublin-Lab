@@ -1,0 +1,23 @@
+.header { position: relative; z-index: 2; min-height: 54px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 6px 26px; flex-shrink: 0; color: var(--ink); -webkit-app-region: no-drag; }
+.header h1 { min-width: 0; margin: 0; font-size: 13px; font-weight: 500; line-height: 1.5; letter-spacing: -.015em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.anchor { position: relative; flex-shrink: 0; }
+.trigger { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid transparent; border-radius: 9px; color: var(--muted); background: transparent; font: inherit; font-size: 11px; cursor: pointer; }
+.trigger:hover, .trigger[aria-expanded='true'] { color: var(--ink); background: var(--hover); border-color: var(--line); }
+.picker { position: absolute; right: 0; top: calc(100% + 9px); z-index: 210; width: min(304px, calc(100vw - 48px)); box-sizing: border-box; border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: var(--surface); color: var(--ink); box-shadow: 0 16px 48px #0002; text-align: left; }
+.pickerHeading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.pickerHeading strong { font-weight: 500; font-size: 12px; }
+.pickerHeading button { border: 0; background: transparent; color: var(--muted); font-size: 20px; cursor: pointer; }
+.search { display: block; width: 100%; box-sizing: border-box; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--soft); color: var(--ink); font: inherit; font-size: 12px; }
+.projects { max-height: min(240px, 30vh); overflow-y: auto; padding: 8px 0; }
+.project { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 8px; border: 0; border-radius: 9px; background: transparent; color: var(--ink); font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
+.project:hover, .project[aria-pressed='true'] { background: var(--hover); }
+.project svg { flex-shrink: 0; color: var(--muted); }
+.project > span:first-of-type { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.check { color: var(--accent); width: 14px; }
+.footer { border-top: 1px solid var(--line); padding-top: 12px; }
+.footer p, .empty { color: var(--muted); font-size: 11px; line-height: 1.7; margin: 0 0 12px; }
+.empty { padding: 18px 8px; text-align: center; }
+.confirm { width: 100%; border: 0; border-radius: 9px; background: var(--ink); color: var(--surface); padding: 10px; font: inherit; font-size: 12px; cursor: pointer; }
+.confirm:disabled, .trigger:disabled { opacity: .4; cursor: default; }
+.header button:focus-visible, .search:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) { .header { padding: 6px 16px; gap: 12px; } }

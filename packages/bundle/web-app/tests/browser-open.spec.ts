@@ -87,7 +87,7 @@ describe('web app browser startup', () => {
       }
     }
     // The fixture wrapper must apply the same defaults as the real plugin's exported schema.
-    globals.__dshWebAppApply = (ctx, config) => apply(ctx, new Config(config))
+    globals.__dshWebAppApply = (ctx, config) => { apply(ctx, new Config(config)) }
     globals.__dshWebServer = WebServer
     globals.__dshConnection = {
       authenticatedUrl: (baseUrl) => {

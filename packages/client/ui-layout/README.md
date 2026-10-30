@@ -37,9 +37,11 @@ Workbench settings use flat groups with hairline dividers and monochrome shared 
 
 Dublin Lab adds GitHub Trending to the navigation rail, defaulting to weekly rankings with daily/monthly and language filters. Local cloning, Fork, independent copying and GitHub Pages publishing require explicit dialog confirmation; remote writes use the account shown on the page. The page reads the loopback-only GitHub owner in [web-app](../../bundle/web-app/README.md).
 
+The header To-dos and Quick notes entries open mutually exclusive, non-modal drawers without unmounting the workspace. Tasks support editing, completion filters and confirmed deletion. Plain-text notes save on every edit and retain a list of saved notes, without revision history. Records are shared across projects in the same browser profile, stored separately under `dublin.organizer.v1.*` in localStorage, and survive application restart. Clearing browser data removes them; they are not project files or cloud backups. Failed writes remain in memory with a retry control and an unsaved warning; quitting before a successful retry loses those pending edits. Storage events merge other-window edits per item; concurrent edits of the same saved item use the last successful write.
+
 Each repository card labels its author-supplied description as the project purpose. The optional Chinese translation switch is off initially; enabling it sends only public descriptions through the Host to [MyMemory](https://mymemory.translated.net/doc/spec.php), with three UI requests at a time. Machine translations preserve the original in a disclosure, and unavailable/quota-limited translations retain the original with a warning. Missing descriptions link users to the repository README rather than inventing a purpose. The idle camera island is a plain black pill with no visible text or decoration; its accessible label remains available to assistive technology. The appearance entry contains text only.
 
-The centered camera island requests video only after a click, mirrors a local live preview, and stops all tracks on preview click, page hiding, unmount, or a late permission result after cancellation. It does not record or upload. The right-hand appearance control offers light and charcoal styles through the existing theme service. Appearance metadata stays in `dublin.appearance.v1`; background images stay in local IndexedDB and accept PNG/JPEG/WebP/GIF up to 20 MB. The workspace and conversation share the image with independent 0–100% transparency controls; 0% shows it fully and 100% hides it. Older preferences initialize conversation transparency from the workspace value. The document panel and input card retain readable fills. Replacing or unmounting a background revokes its object URL. Browser storage clearing removes these preferences, not project files.
+The centered camera island requests video only after a click, mirrors a local live preview, and stops all tracks on preview click, page hiding, unmount, or a late permission result after cancellation. It does not record or upload. The appearance control in Settings offers light and charcoal styles through the existing theme service. Appearance metadata stays in `dublin.appearance.v1`; background images stay in local IndexedDB and accept PNG/JPEG/WebP/GIF up to 20 MB. The workspace and conversation share the image with independent 0–100% transparency controls; 0% shows it fully and 100% hides it. Older preferences initialize conversation transparency from the workspace value. The document panel and input card retain readable fills. Replacing or unmounting a background revokes its object URL. Browser storage clearing removes these preferences, not project files.
 
 The conversation clips the full workbench image canvas instead of fitting the image to its own pane. Both layers retain the same scale and position when navigating or resizing the window and sidebar; only their transparency differs.
 
@@ -78,14 +80,27 @@ Read these pages when the layout surface is not enough. They move from the frame
 
 -----
 
+The home page omits task and reminder preview cards. Recording, Quick notes, To-dos and Reminders appear beside search in the top header; API keys sit at the bottom of the navigation rail. Settings contains Appearance. These drawers are mutually exclusive. It reads the Host catalog, edits full timing/content, pauses/resumes tasks and confirms cancellation. Unread in-app banners remain visible with the drawer closed. The feed polls while mounted, refreshes on visibility changes and aborts requests and clears its timer on unmount. Creation uses conversation in Standard mode; reminder persistence belongs to [web-app](../../bundle/web-app/README.md#local-workbench-behavior), not localStorage.
+
 <a id="model-experience"></a>
+
+Temporary chats open from the home quick action or navigation rail without a project picker. The sidebar lists retained Host history and restores the exact Session identity after restart or project navigation. Chat reuses the existing slot and aligned background. Continue in project preserves the original and opens a completed-history continuation; blank/running chats cannot transfer. Failures keep the list available for retry.
+
+The transparent compact header shows the current chat title and opens project selection in an anchored searchable picker. Escape and outside clicks dismiss it; continuation requires an explicit project selection and confirmation. Only blank chats show the short history-retention hint.
+
+The top header groups search, Recording, Quick notes, To-dos and Reminders with a shared pill outline. Recording uses a small red dot; notes, to-dos and reminders use compact emoji marks, repeated in their drawer titles. Marks are decorative and do not change accessible names. During capture, the Recording entry shows its elapsed status. Tool controllers remain mounted across navigation so reminders continue arriving and recording continues with its drawer closed. Drawer clearance follows the responsive platform header height. The search dialog input uses border-box sizing so its full width preserves both content gutters.
+
+The Recording header entry and API keys bottom navigation entry open mutually exclusive right drawers. Organizer changes synchronize within the same window as well as between windows. Recording stays active when its drawer closes; its elapsed state remains in the header. The desktop bridge saves mono 16 kHz PCM to seekable WAV files incrementally, restores interrupted recordings, and caps each recording at two hours. Playback, seeking, rename, export and confirmed deletion work without a project. Upload-and-transcribe requires explicit confirmation; Alibaba Cloud returns timestamped anonymous speaker segments. Organizing explicitly sends the transcript to the configured text model; saving notes and adding each reviewed action remain separate gestures. API credentials are configured separately from vault cards.
+
+Vault cards contain provider, account and a masked key, with an expanding editor. Secrets remain in the native encrypted file; reveal, copy, existing-card edits and deletion require native user presence. Revealed values hide on blur or after sixty seconds; native clipboard contents are cleared after thirty seconds only if still equal to the copied key. Recording and vault operations require the desktop application; the web page shows that limitation.
+
 ## Model Experience
 
-None, as the layout shell manages browser viewing state; nothing here reaches a model request.
+None, as this UI layer registers no agent prompt or tool and its explicit transcription and summary requests run separately from agent conversations.
 
 #### KV Cache effect
 
-None; this package neither assembles nor sends a provider request.
+No effect on agent-session KV caches. Explicit recording summaries are separate requests containing the selected transcript.
 
 ## Known Limitations and Deferred Work
 

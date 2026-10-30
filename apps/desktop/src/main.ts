@@ -27,8 +27,10 @@ import { DesktopProjectManager } from './project-manager.ts'
 import { DesktopHostFatalError, DesktopHostProcess, DesktopHostUncleanExitError } from './host-process.ts'
 import { DesktopPlatformView, PLATFORM_IPC, platformBounds } from './platform-view.ts'
 import { installDesktopDirectoryPicker } from './directory-picker.ts'
+import { installDublinTools } from './dublin-tools-native.ts'
 import { installMicrophonePermissions } from './microphone-permissions.ts'
 import { DesktopBackendController } from './backend-controller.ts'
+import { createReminderNotifications } from './dublin-notifications.ts'
 import { DESKTOP_IPC, SCHEME, assertDesktopSender, type DesktopUpdateState } from './ipc.ts'
 import { readDeviceInfo } from './device-info.ts'
 import { desktopUpdateReadyConfirmation, formatDesktopMessage, resolveDesktopLocale, resolveDesktopStartupLocale } from './locale.ts'
@@ -439,12 +441,13 @@ async function main(): Promise<void> {
   }
   const platformView = new DesktopPlatformView(join(app.getAppPath(), 'lib', 'preload-platform-account.cjs'),
     () => locale.id === 'zh-CN' ? 'zh_CN' : 'en_US', process.platform === 'win32' ? 'win32' : 'darwin')
+  const reminderNotifications = createReminderNotifications(() => { focusPrimaryWindow() }, (error) => { console.error(error) })
   const backend = new DesktopBackendController((onFailure) => {
     const hostInspectPort = developmentHostInspectPort(development)
     const host = new DesktopHostProcess(resources.node, resources.dsh, activeProject,
       hostInspectPort, { ...hostEnvironment, DSH_CLIENT_VERSION: desktopClientVersion() }, onFailure,
       primaryRuntime,
-      resources, (next) => { platformView.setSession(next) })
+      resources, (next) => { platformView.setSession(next) }, reminderNotifications.show)
     return {
       start: async () => {
         const ready = await host.start()
@@ -678,6 +681,7 @@ async function main(): Promise<void> {
 
   installDesktopDirectoryPicker(() => mainWindow)
   installMicrophonePermissions(session.defaultSession, () => mainWindow?.webContents)
+  const personalRecordings = installDublinTools(assertProductSender)
   const shortcuts = installDesktopShortcuts(() => mainWindow, app.getPath('userData'),
     process.platform === 'darwin' ? 'macos' : process.platform === 'win32' ? 'windows' : 'linux', () => { refreshApplicationMenu() }, window => updateOverlays.input(window))
   app.on('will-quit', () => { shortcuts.dispose() })
@@ -995,7 +999,11 @@ async function main(): Promise<void> {
     : undefined
   const quitConfirmation = new DesktopQuitConfirmation({
     locale: () => locale,
-    inspect: () => backend.host?.inspectQuit(),
+    inspect: async () => {
+      const inspection = await backend.host?.inspectQuit()
+      return { activeTasks: personalRecordings.busy || inspection?.activeTasks === true,
+        scheduledTasks: inspection?.scheduledTasks === true }
+    },
     // No owner window: a hidden window stays hidden and the native box is its own top-level window.
     show: options => dialog.showMessageBox(options),
     // macOS raises the open alert with the application; Electron exposes no handle to the Windows task
@@ -1239,6 +1247,7 @@ async function main(): Promise<void> {
   })
   if (process.platform !== 'win32') powerMonitor.on('shutdown', () => { sessionEnding = true })
   const finishQuit = (): void => {
+    reminderNotifications.dispose()
     quitting = true
     shuttingDown = true
     updateJournal?.action('quit-requested')
@@ -1251,7 +1260,8 @@ async function main(): Promise<void> {
     updateSchedule.dispose()
     updateDialog.dispose()
     mandatoryUI?.dispose()
-    void Promise.all([Promise.resolve(mandatoryPolicy?.dispose()).then(() => policyAuth?.dispose()), backend.close(),
+    void Promise.all([personalRecordings.finish(),
+      Promise.resolve(mandatoryPolicy?.dispose()).then(() => policyAuth?.dispose()), backend.close(),
       // A Platform cleanup failure is logged without cutting the remaining Host shutdown short.
       platformView.dispose().catch((error: unknown) => { console.error(error) })])
       .catch((error: unknown) => { console.error(error) }).finally(() => { app.quit() })

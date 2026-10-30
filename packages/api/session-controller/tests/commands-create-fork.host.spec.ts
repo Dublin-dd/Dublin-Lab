@@ -290,4 +290,26 @@ describe('Session fork failures', () => {
     expect(options.meta?.agentPreset).toBe('minimal')
     await ctx.fiber.dispose()
   })
+  it('continues completed history in an explicit workspace without rewriting the source cwd', async () => {
+    const ctx = await baseContext()
+    const attachSession = vi.fn(async () => {})
+    const workspace = { id: 'destination' as WorkspaceId, path: '/target-project', attachSession }
+    ctx.provide('workspaceRegistry', { get: (id: string) => id === 'destination' ? workspace : undefined, list: () => [] } as never)
+    const source = completedSession(ctx, 'temporary-source', '/private-chats/original')
+    const create = vi.spyOn(ctx.agents, 'create').mockImplementation(
+      (options: CreateAgentOptions) => Promise.resolve(resolvedHandle(ctx, options.sessionId)),
+    )
+    const controller = new SessionCommandController(ctx, controllerAgents(), '/default')
+    const child = await controller.fork({ sessionId: source.id, workspaceId: workspace.id })
+    const expectedSeed: unknown = expect.arrayContaining([expect.objectContaining({ type: 'turn/end' })])
+    expect(create.mock.calls[0]?.[0]).toMatchObject({
+      meta: { cwd: '/target-project', parentSession: source.id, isSeeded: true },
+      seed: expectedSeed,
+    })
+    expect(attachSession).toHaveBeenCalledWith(child.sessionId)
+    expect(source.header.cwd).toBe('/private-chats/original')
+    await expect(controller.fork({ sessionId: source.id, workspaceId: 'missing' as WorkspaceId })).rejects.toThrow()
+    expect(create).toHaveBeenCalledTimes(1)
+    await ctx.fiber.dispose()
+  })
 })

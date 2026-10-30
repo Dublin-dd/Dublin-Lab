@@ -4,11 +4,13 @@ import { fileURLToPath } from 'node:url'
 import { SiminFileError, SiminFiles } from './simin-files.ts'
 import { SiminProposals } from './simin-proposals.ts'
 import type { DublinGithub } from './dublin-github.ts'
+import type { DublinReminders } from './dublin-reminders.ts'
+import type { DublinTemporarySessions } from './dublin-temporary.ts'
 
 /** Default projects directory beside the source checkout or installed runtime. */
 export const AIPM_PRODUCT_ROOT = fileURLToPath(new URL('../../../../projects', import.meta.url))
 /** Exact endpoint list registered on the Host. */
-export const SIMIN_ROUTES = ['/aipm/product', '/aipm/projects', '/aipm/file', '/aipm/stage', '/aipm/state', '/aipm/mutate', '/aipm/decide', '/aipm/search', '/aipm/github']
+export const SIMIN_ROUTES = ['/aipm/product', '/aipm/projects', '/aipm/file', '/aipm/stage', '/aipm/state', '/aipm/mutate', '/aipm/decide', '/aipm/search', '/aipm/github', '/aipm/reminders', '/aipm/temporary']
 
 /**
  * Validate a project or document path component.
@@ -56,13 +58,34 @@ function localRequest(req: IncomingMessage): boolean {
  * @returns whether a Simin endpoint answered.
  */
 export async function handleAipmRequest(
-  req: IncomingMessage, res: ServerResponse, workbench: { files: SiminFiles; proposals: SiminProposals; github?: DublinGithub },
+  req: IncomingMessage, res: ServerResponse,
+  workbench: {
+    files: SiminFiles
+    proposals: SiminProposals
+    github?: DublinGithub
+    reminders?: DublinReminders
+    temporary?: DublinTemporarySessions
+  },
 ): Promise<boolean> {
   const { files: siminFiles, proposals: siminProposals } = workbench
   const url = new URL(req.url ?? '/', 'http://127.0.0.1')
   if (!SIMIN_ROUTES.includes(url.pathname)) return false
   if (!localRequest(req)) { sendJson(res, 403, { error: 'localOnly' }); return true }
   try {
+    if (url.pathname === '/aipm/temporary') {
+      if (workbench.temporary === undefined) throw new SiminFileError('temporaryUnavailable')
+      if (req.method === 'GET') sendJson(res, 200, await workbench.temporary.list())
+      else if (req.method === 'POST') sendJson(res, 200, await workbench.temporary.invoke(await body(req)))
+      else sendJson(res, 405, { error: 'method' })
+      return true
+    }
+    if (url.pathname === '/aipm/reminders') {
+      if (workbench.reminders === undefined) throw new SiminFileError('reminderUnavailable')
+      if (req.method === 'GET') sendJson(res, 200, await workbench.reminders.snapshot())
+      else if (req.method === 'POST') sendJson(res, 200, await workbench.reminders.invoke(await body(req)))
+      else sendJson(res, 405, { error: 'method' })
+      return true
+    }
     if (url.pathname === '/aipm/github') {
       if (workbench.github === undefined) throw new SiminFileError('githubUnavailable')
       if (req.method === 'GET') sendJson(res, 200, await workbench.github.read(url.searchParams))

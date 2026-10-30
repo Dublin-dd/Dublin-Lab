@@ -23,7 +23,12 @@ interface PlatformSessionEvent {
   readonly session: PlatformSession | null
 }
 
-type DesktopHostEvent = ReadyEvent | FatalEvent | PlatformSessionEvent | { readonly type: 'shutdown-complete' } | {
+type DesktopHostEvent = ReadyEvent | FatalEvent | PlatformSessionEvent | {
+  readonly type: 'dublin-reminder'
+  readonly id: string
+  readonly title: string
+  readonly message: string
+} | { readonly type: 'shutdown-complete' } | {
   readonly type: 'update-tasks'
   readonly requestId: number
   readonly active: boolean
@@ -54,6 +59,10 @@ function isDesktopHostEvent(message: unknown): message is DesktopHostEvent {
   if (typeof message !== 'object' || message === null || !('type' in message)) return false
   const candidate = message as Record<string, unknown>
   switch (candidate.type) {
+    case 'dublin-reminder':
+      return typeof candidate.id === 'string' && candidate.id.length <= 100
+        && typeof candidate.title === 'string' && candidate.title.length <= 120
+        && typeof candidate.message === 'string' && candidate.message.length <= 2000
     case 'shutdown-complete':
       return true
     case 'ready':
@@ -177,6 +186,7 @@ export class DesktopHostProcess {
     private readonly packageManager?: { readonly pnpm: string; readonly nodeBin: string },
 
     private readonly onPlatformSession?: (session: PlatformSession | null) => void,
+    private readonly onReminder?: (reminder: { id: string; title: string; message: string }) => void,
   ) {}
 
   /**
@@ -210,6 +220,7 @@ export class DesktopHostProcess {
         return
       }
       if (message.type === 'ready') this.readyResolve({ url: message.url, injections: message.injections })
+      else if (message.type === 'dublin-reminder') this.onReminder?.(message)
       else if (message.type === 'platform-session') this.onPlatformSession?.(message.session)
       else if (message.type === 'shutdown-complete') {
         if (this.stopping) this.shutdownCompleted = true

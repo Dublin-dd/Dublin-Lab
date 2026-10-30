@@ -54,7 +54,14 @@ async function backgroundFile(next?: Blob | null): Promise<Blob | null> {
  * Own persisted appearance and release every background object URL on replacement or unmount.
  * @returns appearance controls and the locally loaded background URL.
  */
-export function useDublinAppearance() {
+export function useDublinAppearance(): {
+  appearance: DublinAppearance
+  imageUrl: string | null
+  error: boolean
+  saving: boolean
+  update: (next: DublinAppearance) => void
+  setBackground: (file: File | null) => Promise<void>
+} {
   const [appearance, setAppearance] = useState(loadDublinAppearance)
   const [image, setImage] = useState<Blob | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)

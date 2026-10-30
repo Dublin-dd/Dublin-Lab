@@ -1,0 +1,48 @@
+{
+  "name": "dublin_reminder",
+  "description": "Create and manage Dublin Lab reminders. Use this tool for user reminders, not schedule_create. Ask for a time if ambiguous. Create/update requires title, message and exactly one of afterSeconds, at, or time. at is an ISO instant with an explicit offset. time is HH:mm for daily reminders; add weekdays (ISO Monday=1 to Sunday=7) for weekly reminders. Calendar rules use the Mac time zone at creation, returned by list. Confirm the actual saved time and rule only after success. Notifications are direct, with no later AI call. The app must stay running (window may close); missed occurrences surface on restart, latest only per recurring task. Use id for update/pause/resume/delete. update replaces the full title, message and timing and activates the task. Never claim to have scheduled a reminder without a successful create/update result.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "create",
+          "list",
+          "update",
+          "pause",
+          "resume",
+          "delete",
+          "acknowledge"
+        ]
+      },
+      "id": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "afterSeconds": {
+        "type": "integer"
+      },
+      "at": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      },
+      "weekdays": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        }
+      }
+    },
+    "required": [
+      "action"
+    ]
+  }
+}

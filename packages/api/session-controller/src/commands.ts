@@ -255,7 +255,10 @@ export class SessionCommandController {
     const seed = buildForkSeed(source.events, boundary)
     let workspace: Workspace | undefined
     try {
-      workspace = await this.forkWorkspace(source.header)
+      if (request.workspaceId !== undefined) {
+        workspace = this.ctx.workspaceRegistry.get(request.workspaceId)
+        if (workspace === undefined) throw new Error('Destination workspace not found')
+      } else workspace = await this.forkWorkspace(source.header)
     } catch (error) {
       throw new RemoteError(
         'gateway/internal',
@@ -272,7 +275,9 @@ export class SessionCommandController {
         seed,
         inheritedEventCount: SessionLogOffset(boundary + 1),
         meta: {
-          ...(source.header.cwd === undefined ? {} : { cwd: source.header.cwd }),
+          ...(request.workspaceId === undefined || workspace === undefined
+            ? source.header.cwd === undefined ? {} : { cwd: source.header.cwd }
+            : { cwd: workspace.path }),
           parentSession: source.header.id,
           isSeeded: true,
           ...(composition.agentPreset === undefined

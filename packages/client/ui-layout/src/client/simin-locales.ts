@@ -1,5 +1,6 @@
 /** Workbench-owned Chinese dictionary. */
 import { dublinZh, dublinEn } from './dublin-locales.ts'
+/** Chinese workbench labels composed with Dublin personal tools. */
 export const siminZh = {
   ...dublinZh,
   stage: '本阶段', stageUnset: '尚未接入', stageHint: '流程尚未接入。阶段名称会在 Skill 接入后出现。', evidenceGaps: '待补充证据', noGaps: '暂无缺口', stageBusy: '正在写入…', stageConfirm: '确认本阶段', stageBlocked: '证据补齐后才能确认，并进入下一阶段。', stageSaved: '本阶段已确认。', productLabel: '产品',

@@ -320,6 +320,8 @@ export interface SessionRenameValue {
 /** Session fork request. */
 export interface SessionForkRequest {
   readonly sessionId: SessionId
+  /** Explicit destination for a preserved-history continuation; the source remains unchanged. */
+  readonly workspaceId?: WorkspaceId
   /** Exact inclusive source event seq; omission selects the latest completed-turn prefix. */
   readonly atSeq?: number
 }

@@ -90,6 +90,7 @@ it('awaits login process closure and never inherits model tokens', async () => {
   const service = owner(); service.write({ op: 'login' }); await vi.waitFor(() => { expect(spawn).toHaveBeenCalledOnce() })
   const env = vi.mocked(spawn).mock.calls[0]?.[2]?.env
   expect(env?.MODEL_API_KEY).toBeUndefined(); expect(env?.GH_TOKEN).toBeUndefined()
-  await service.dispose(); expect(child.kill).toHaveBeenCalledWith('SIGTERM')
+  const kill = vi.spyOn(child, 'kill')
+  await service.dispose(); expect(kill).toHaveBeenCalledWith('SIGTERM')
   expect(() => service.write({ op: 'login' })).toThrow('githubUnavailable')
 })

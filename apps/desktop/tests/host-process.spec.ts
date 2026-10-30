@@ -238,3 +238,13 @@ it.each([undefined, '', 7])('rejects malformed Platform account identity %s on p
   expect(changed.mock.calls).toEqual([[null]])
   await host.stop()
 })
+
+it('delivers reminder IPC without treating it as a fatal or control response', async () => {
+  const reminder = { type: 'dublin-reminder', id: 'one', title: '交文档', message: '该交文档了' }
+  const runtime = projectWithHost(HTTP_HOST.replace("process.send({ type: 'ready'",
+    `process.send(${JSON.stringify(reminder)}); process.send({ type: 'ready'`))
+  const received = vi.fn()
+  const host = new DesktopHostProcess(process.execPath, runtime, runtime, undefined, process.env,
+    undefined, undefined, undefined, undefined, received)
+  hosts.push(host); await host.start(); expect(received).toHaveBeenCalledWith(reminder); await host.stop()
+})
