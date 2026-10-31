@@ -33,6 +33,8 @@ import { SiminFiles } from './simin-files.ts'
 import { DublinGithub } from './dublin-github.ts'
 import { installDublinBrowser } from './dublin-browser.ts'
 import { DublinReminders, installDublinReminders } from './dublin-reminders.ts'
+import { DublinMemoryStore } from './dublin-memory-store.ts'
+import { DublinMemoryRuntime } from './dublin-memory-runtime.ts'
 import { DublinTemporarySessions } from './dublin-temporary.ts'
 import { parsePublicUrl } from './public-url.ts'
 
@@ -282,6 +284,10 @@ export function apply(ctx: Context, config: Config): void {
   }, (error) => { ctx.logger.warn(`Dublin reminders: ${String(error)}`) })
   installDublinReminders(ctx, reminders, config.projectRoot)
   const temporary = new DublinTemporarySessions(ctx, config.projectRoot)
+  const memoryStore = new DublinMemoryStore(join(config.projectRoot, '.dublin-memory'))
+  const memory = new DublinMemoryRuntime(ctx, memoryStore, config.projectRoot)
+  memory.install()
+  ctx.effect(() => async () => { await memory.dispose(); await memoryStore.dispose() })
   ctx.effect(() => () => github.dispose())
   installSiminProposals(ctx, proposals)
   installDublinBrowser(ctx, config.projectRoot, {
@@ -292,7 +298,7 @@ export function apply(ctx: Context, config: Config): void {
       kind: 'exact',
       path,
       handler: async (req, res) => {
-        const handled = await handleAipmRequest(req, res, { files, proposals, github, reminders, temporary })
+        const handled = await handleAipmRequest(req, res, { files, proposals, github, reminders, temporary, memory })
         if (!handled) {
           res.writeHead(404)
           res.end()

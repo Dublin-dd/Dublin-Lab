@@ -4,13 +4,14 @@ import { fileURLToPath } from 'node:url'
 import { SiminFileError, SiminFiles } from './simin-files.ts'
 import { SiminProposals } from './simin-proposals.ts'
 import type { DublinGithub } from './dublin-github.ts'
+import type { DublinMemoryRuntime } from './dublin-memory-runtime.ts'
 import type { DublinReminders } from './dublin-reminders.ts'
 import type { DublinTemporarySessions } from './dublin-temporary.ts'
 
 /** Default projects directory beside the source checkout or installed runtime. */
 export const AIPM_PRODUCT_ROOT = fileURLToPath(new URL('../../../../projects', import.meta.url))
 /** Exact endpoint list registered on the Host. */
-export const SIMIN_ROUTES = ['/aipm/product', '/aipm/projects', '/aipm/file', '/aipm/stage', '/aipm/state', '/aipm/mutate', '/aipm/decide', '/aipm/search', '/aipm/github', '/aipm/reminders', '/aipm/temporary']
+export const SIMIN_ROUTES = ['/aipm/product', '/aipm/projects', '/aipm/file', '/aipm/stage', '/aipm/state', '/aipm/mutate', '/aipm/decide', '/aipm/search', '/aipm/github', '/aipm/reminders', '/aipm/temporary', '/aipm/memory']
 
 /**
  * Validate a project or document path component.
@@ -25,13 +26,13 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' })
   res.end(JSON.stringify(body))
 }
-async function body(req: IncomingMessage): Promise<Record<string, unknown>> {
+async function body(req: IncomingMessage, limit = 2_100_000): Promise<Record<string, unknown>> {
   const chunks: Buffer[] = []
   let bytes = 0
   for await (const chunk of req) {
     const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk))
     bytes += buffer.length
-    if (bytes > 2_100_000) throw new SiminFileError('unsupportedFile', 413)
+    if (bytes > limit) throw new SiminFileError('unsupportedFile', 413)
     chunks.push(buffer)
   }
   const value: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'))
@@ -65,6 +66,7 @@ export async function handleAipmRequest(
     github?: DublinGithub
     reminders?: DublinReminders
     temporary?: DublinTemporarySessions
+    memory?: DublinMemoryRuntime
   },
 ): Promise<boolean> {
   const { files: siminFiles, proposals: siminProposals } = workbench
@@ -72,6 +74,13 @@ export async function handleAipmRequest(
   if (!SIMIN_ROUTES.includes(url.pathname)) return false
   if (!localRequest(req)) { sendJson(res, 403, { error: 'localOnly' }); return true }
   try {
+    if (url.pathname === '/aipm/memory') {
+      if (workbench.memory === undefined) throw new SiminFileError('memoryUnavailable')
+      if (req.method === 'GET') sendJson(res, 200, await workbench.memory.store.snapshot())
+      else if (req.method === 'POST') sendJson(res, 200, await workbench.memory.invoke(await body(req, 100_100_000)))
+      else sendJson(res, 405, { error: 'method' })
+      return true
+    }
     if (url.pathname === '/aipm/temporary') {
       if (workbench.temporary === undefined) throw new SiminFileError('temporaryUnavailable')
       if (req.method === 'GET') sendJson(res, 200, await workbench.temporary.list())
@@ -140,7 +149,7 @@ export async function handleAipmRequest(
       sendJson(res, 200, { fileName })
     } else sendJson(res, 405, { error: 'method' })
   } catch (error: unknown) {
-    const code = error instanceof SiminFileError ? error.code : error instanceof Error && 'code' in error && error.code === 'ENOENT' ? 'missing' : 'io'
+    const code = url.pathname === '/aipm/memory' ? error instanceof Error && /^memory[A-Za-z]+$/u.test(error.message) ? error.message : 'memoryUnavailable' : error instanceof SiminFileError ? error.code : error instanceof Error && 'code' in error && error.code === 'ENOENT' ? 'missing' : 'io'
     sendJson(res, error instanceof SiminFileError ? error.status : code === 'missing' ? 404 : 400, { error: code })
   }
   return true

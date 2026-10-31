@@ -9380,6 +9380,116 @@
       }
     },
     {
+      "key": "event:dublin/memory-call",
+      "kind": "event",
+      "event": "dublin/memory-call",
+      "surface": false,
+      "digest": "be9f6eb85db4e9722f82beefc713d43c25ab60d052a4b62410c2ff220b53e34a",
+      "schema": {
+        "root": 0,
+        "nodes": [
+          {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "data",
+                "type": 1,
+                "optional": false
+              },
+              {
+                "name": "ignorable",
+                "type": 6,
+                "optional": true
+              },
+              {
+                "name": "seq",
+                "type": 7,
+                "optional": false
+              },
+              {
+                "name": "time",
+                "type": 7,
+                "optional": false
+              },
+              {
+                "name": "type",
+                "type": 8,
+                "optional": false
+              }
+            ],
+            "indices": []
+          },
+          {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "input",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "model",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "output",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "phase",
+                "type": 3,
+                "optional": false
+              },
+              {
+                "name": "provider",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "system",
+                "type": 2,
+                "optional": false
+              }
+            ],
+            "indices": []
+          },
+          {
+            "kind": "primitive",
+            "type": "string"
+          },
+          {
+            "kind": "union",
+            "types": [
+              4,
+              5
+            ]
+          },
+          {
+            "kind": "literal",
+            "value": "request"
+          },
+          {
+            "kind": "literal",
+            "value": "result"
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "primitive",
+            "type": "number"
+          },
+          {
+            "kind": "literal",
+            "value": "dublin/memory-call"
+          }
+        ]
+      }
+    },
+    {
       "key": "event:feedback/message-delete",
       "kind": "event",
       "event": "feedback/message-delete",
@@ -22973,6 +23083,11 @@
       "sources": []
     },
     {
+      "digest": "4e7937aa6e19df6c80dc0a7337f6999bf6b7a3c7ff512010903cd5d7e3961384",
+      "names": [],
+      "sources": []
+    },
+    {
       "digest": "4e887768586528565381dadbddee6cef555874148089f4579e0b4b1ad096fc9c",
       "names": [
         "packages/llm/llm/src/types.ts#TextBlock"
@@ -23068,6 +23183,15 @@
       ],
       "sources": [
         "packages/core/session/src/types.ts:273"
+      ]
+    },
+    {
+      "digest": "535e95a4e47199451241eb4351b052b71c17afeebc732f74be89c3059e64c4b9",
+      "names": [
+        "packages/bundle/web-app/src/dublin-memory-runtime.ts#MemoryCall"
+      ],
+      "sources": [
+        "packages/bundle/web-app/src/dublin-memory-runtime.ts:19"
       ]
     },
     {
@@ -23254,6 +23378,11 @@
       "sources": [
         "packages/subagent/subagent/src/descriptor.ts:61"
       ]
+    },
+    {
+      "digest": "5f7c82b1e820d15663284a723503d0eab994dfeb358378c0c25f9fa2bcb5e72b",
+      "names": [],
+      "sources": []
     },
     {
       "digest": "6085488d223aeffdef51d7ae17655fc26ab22ee13cbed82a50e62e2b6fb5b918",
@@ -23716,6 +23845,11 @@
       "sources": [
         "packages/skill/tool-skill/src/index.ts:40"
       ]
+    },
+    {
+      "digest": "83384fda94a729ec2cecc6810be628cd2bbd98109834a9add38e61325431e837",
+      "names": [],
+      "sources": []
     },
     {
       "digest": "8338ee303e2bd448e9e6144069942f63e3cfd5868962bddc9347d7009e8919d6",
@@ -24659,6 +24793,11 @@
       "sources": []
     },
     {
+      "digest": "be9f6eb85db4e9722f82beefc713d43c25ab60d052a4b62410c2ff220b53e34a",
+      "names": [],
+      "sources": []
+    },
+    {
       "digest": "bf16d2e98a7f13894ded2cffe5ce857bf473954a0e3c0ed9bc7739e2e1c7b78a",
       "names": [],
       "sources": []
@@ -25214,6 +25353,11 @@
       "sources": [
         "packages/llm/llm/src/types.ts:458"
       ]
+    },
+    {
+      "digest": "f204d1e11ddeec3d145ebbc55598518d633d724d456b9b72ee2b99bc438ae2e3",
+      "names": [],
+      "sources": []
     },
     {
       "digest": "f230c0b583e23b25ee0a61dbe4c05e95c1e2ae44b27939501eb9e03696f0c278",

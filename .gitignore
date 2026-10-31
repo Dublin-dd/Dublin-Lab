@@ -65,3 +65,7 @@ apps/desktop/*.pfx
 # Design review captures and the superseded image-dependent prototype.
 /prototypes/**/*.png
 /AIPM工作台.html
+
+# Private, portable personal-memory state never belongs in source control.
+**/.dublin-memory/
+Dublin-Lab-memory-backup*.json

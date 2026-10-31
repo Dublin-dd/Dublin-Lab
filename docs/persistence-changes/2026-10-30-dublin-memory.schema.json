@@ -1,0 +1,116 @@
+{
+  "formatVersion": 2,
+  "roots": [
+    {
+      "key": "event:dublin/memory-call",
+      "kind": "event",
+      "event": "dublin/memory-call",
+      "surface": false,
+      "digest": "be9f6eb85db4e9722f82beefc713d43c25ab60d052a4b62410c2ff220b53e34a",
+      "schema": {
+        "root": 0,
+        "nodes": [
+          {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "data",
+                "type": 1,
+                "optional": false
+              },
+              {
+                "name": "ignorable",
+                "type": 6,
+                "optional": true
+              },
+              {
+                "name": "seq",
+                "type": 7,
+                "optional": false
+              },
+              {
+                "name": "time",
+                "type": 7,
+                "optional": false
+              },
+              {
+                "name": "type",
+                "type": 8,
+                "optional": false
+              }
+            ],
+            "indices": []
+          },
+          {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "input",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "model",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "output",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "phase",
+                "type": 3,
+                "optional": false
+              },
+              {
+                "name": "provider",
+                "type": 2,
+                "optional": false
+              },
+              {
+                "name": "system",
+                "type": 2,
+                "optional": false
+              }
+            ],
+            "indices": []
+          },
+          {
+            "kind": "primitive",
+            "type": "string"
+          },
+          {
+            "kind": "union",
+            "types": [
+              4,
+              5
+            ]
+          },
+          {
+            "kind": "literal",
+            "value": "request"
+          },
+          {
+            "kind": "literal",
+            "value": "result"
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "primitive",
+            "type": "number"
+          },
+          {
+            "kind": "literal",
+            "value": "dublin/memory-call"
+          }
+        ]
+      }
+    }
+  ],
+  "types": []
+}

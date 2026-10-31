@@ -23,6 +23,7 @@ import css from './SiminShell.module.css'
 import { CameraIsland, AppearanceControl } from './DublinControls.tsx'
 import { useDublinAppearance } from './dublin-appearance.ts'
 import { useDublinBackgroundAlignment } from './dublin-background.ts'
+import { DublinMemory, MemoryIcon } from './DublinMemory.tsx'
 import { DublinGithub, GithubIcon } from './DublinGithub.tsx'
 import { DublinOrganizer } from './DublinOrganizer.tsx'
 import { DublinToolMark, DublinToolIcon } from './DublinNavigation.tsx'
@@ -378,6 +379,7 @@ export function SiminShell({ chat, nativeSettings, t }: { chat: ReactNode; nativ
       {([['home', 'workbench'], ['documents', 'documents'], ['templates', 'templates'], ['trash', 'trash']] as const).map(([entry, icon]) => <Tooltip key={entry} label={t(entry)} portal><button aria-label={t(entry)} className={`${css.railButton} ${page === entry ? css.selectedRail : ''}`} onClick={() => { navigate(entry) }}><SiminIcon name={icon} /></button></Tooltip>)}
       <Tooltip label={t('temporary')} portal><button aria-label={t('temporary')} className={`${css.railButton} ${page === 'temporary' ? css.selectedRail : ''}`} onClick={() => { navigate('temporary') }}><Star /></button></Tooltip>
       <Tooltip label={t('github')} portal><button aria-label={t('github')} className={`${css.railButton} ${page === 'github' ? css.selectedRail : ''}`} onClick={() => { navigate('github') }}><GithubIcon /></button></Tooltip>
+      <Tooltip label={t('memoryTitle')} portal><button aria-label={t('memoryTitle')} className={`${css.railButton} ${page === 'memory' ? css.selectedRail : ''}`} onClick={() => { navigate('memory') }}><MemoryIcon /></button></Tooltip>
       <span className={css.railSpacer} /><Tooltip label={t('toolsVault')} portal><button type="button" className={css.railButton} aria-label={t('toolsVault')} onClick={(event) => { openTool('vault', event.currentTarget) }}><DublinToolIcon kind="vault" /></button></Tooltip>{iconButton('settings', () => { navigate('settings') }, <SiminIcon name="settings" />)}<span className={css.avatar}>{t('avatar')}</span>
     </nav>
     <aside className={`${css.side} ${navOpen ? css.sideOpen : ''}`}><div className={css.brand}>{t('brand')}<small>{t('personal')}</small></div>
@@ -405,7 +407,7 @@ export function SiminShell({ chat, nativeSettings, t }: { chat: ReactNode; nativ
               <h2>{t(temporary.busy ? 'preparing' : 'temporaryWelcome')}</h2>
               <button type="button" className={css.primary} disabled={temporary.busy} onClick={() => { temporary.request('create') }}>{t('temporaryNew')}</button>
             </div>}</section></div>
-        </div> : page === 'github' ? <DublinGithub t={t} /> : loading ? <div className={css.loading}><span className={css.spinner} /></div> : page === 'home' ? <div className={css.home}>
+        </div> : page === 'memory' ? <DublinMemory t={t} projects={snapshot.projects.map(item => item.name)} /> : page === 'github' ? <DublinGithub t={t} /> : loading ? <div className={css.loading}><span className={css.spinner} /></div> : page === 'home' ? <div className={css.home}>
           <span className={`${css.orb} ${css.welcomeOrb}`}><Star /></span><h1>{t(new Date().getHours() < 12 ? 'morning' : 'afternoon')}<span className={css.greetingEmoji} aria-hidden="true">👋</span></h1><p>{t('welcome')}</p>
           <section className={css.homeProjects}><div className={css.projectsHeading}><span>{t('projects')} <small>{snapshot.projects.length}</small></span><span>{iconButton('grid', () => { setListView(false) }, <IconBrowseOutlineRegular size={13} />)}{iconButton('list', () => { setListView(true) }, <IconPanelLeftOutlineRegular size={13} />)}</span></div>{snapshot.projects.length === 0 ? <div className={css.firstProject}><h2>{t('noProjects')}</h2><p>{t('noProjectsHint')}</p>{button('create', () => { begin({ kind: 'create' }) }, true)}</div> : <div className={listView ? css.projectList : css.projectGrid}>{snapshot.projects.map(item => <Folder key={item.path} project={item} t={t} onOpen={() => { openProject(item) }} />)}</div>}</section>
           <div className={css.quickActions}>{button('temporaryNew', () => { temporary.request('create') }, false, <Star />)}{button('create', () => { begin({ kind: 'create' }) }, false, <IconPlusOutlineRegular size={13} />)}{button('documents', () => { navigate('documents') }, false, <IconDeliverDocRegular size={13} />)}{button('fromTemplate', () => { navigate('templates') }, false, <IconAgentPresetOutlineRegular size={13} />)}{button('search', () => { setSearchOpen(true) }, false, <IconSearchOutlineRegular size={13} />)}</div><p className={css.homeFoot}>{t('foot')}</p>

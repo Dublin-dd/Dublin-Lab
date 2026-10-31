@@ -37,6 +37,7 @@
 | `event:compaction/summary` | event | `e2f9a41e0989f54ed8cee80f8db2bcf9d60a5c810dc9d45b83fa050b9dce7602` | [`{ type: "compaction/summary" }`](#persistence-type-sha256-e2f9a41e0989f54ed8cee80f8db2bcf9d60a5c810dc9d45b83fa050b9dce7602) |
 | `event:deliverables/presented` | event | `13d3d180f977bf78081d487ffa0ecb75857349bcab29a5a3fb48189fca2a6176` | [`{ type: "deliverables/presented" }`](#persistence-type-sha256-13d3d180f977bf78081d487ffa0ecb75857349bcab29a5a3fb48189fca2a6176) |
 | `event:developer/message` | event | `186159f5f6f67a0b8cd095b8fe55bef42d4f25ca1a1c248f859867af2ece0467` | [`{ type: "developer/message" }`](#persistence-type-sha256-186159f5f6f67a0b8cd095b8fe55bef42d4f25ca1a1c248f859867af2ece0467) |
+| `event:dublin/memory-call` | event | `be9f6eb85db4e9722f82beefc713d43c25ab60d052a4b62410c2ff220b53e34a` | [`{ type: "dublin/memory-call" }`](#persistence-type-sha256-be9f6eb85db4e9722f82beefc713d43c25ab60d052a4b62410c2ff220b53e34a) |
 | `event:feedback/message-delete` | event | `3ee93b06f3a125850337602bcdf155d2538c43a5c944ec55b1b3c365152d6796` | [`{ type: "feedback/message-delete" }`](#persistence-type-sha256-3ee93b06f3a125850337602bcdf155d2538c43a5c944ec55b1b3c365152d6796) |
 | `event:feedback/message-put` | event | `b5086d249e8502e9ead1d39156bb8d559bde7951cac0f14ce150345b4e42a2bf` | [`{ type: "feedback/message-put" }`](#persistence-type-sha256-b5086d249e8502e9ead1d39156bb8d559bde7951cac0f14ce150345b4e42a2bf) |
 | `event:feedback/record` | event | `b54940ff095c17e874c5be03815f4c2145a256cf3a1d34dae4ab2f7769dfffe8` | [`{ type: "feedback/record" }`](#persistence-type-sha256-b54940ff095c17e874c5be03815f4c2145a256cf3a1d34dae4ab2f7769dfffe8) |
@@ -503,6 +504,19 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
 ```
 
 来源：[`packages/core/session/src/types.ts:311`](../packages/core/session/src/types.ts)
+
+### `dublin/*`
+
+<a id="dublinmemory-call--log-only"></a>
+
+#### `dublin/memory-call` — log-only
+
+```ts persistence-catalog
+/** Log-only memory extraction request/result; does not introduce a user turn. */
+'dublin/memory-call': MemoryCall
+```
+
+来源：[`packages/bundle/web-app/src/dublin-memory-runtime.ts:30`](../packages/bundle/web-app/src/dublin-memory-runtime.ts)
 
 ### `feedback/*`
 
@@ -1711,6 +1725,14 @@ SHA-256: `23af3759678a30de1d11d946772da8c051c63caa67997c5da05d30d7a9fe8a97`
 
 `"dsh-session-title-llm"`
 
+<a id="persistence-type-sha256-5f7c82b1e820d15663284a723503d0eab994dfeb358378c0c25f9fa2bcb5e72b"></a>
+
+### `"dublin/memory-call"`
+
+SHA-256: `5f7c82b1e820d15663284a723503d0eab994dfeb358378c0c25f9fa2bcb5e72b`
+
+`"dublin/memory-call"`
+
 <a id="persistence-type-sha256-ad22a5ca5bbaab2e1440779cd3648e85ddfc6f73b5207394eda699555cf31430"></a>
 
 ### `"edit"`
@@ -2269,6 +2291,14 @@ SHA-256: `f6cb462f808309e315fea634f1ed86268b8346bbcee6774d9097ca6eed7ac1f8`
 
 `"replace"`
 
+<a id="persistence-type-sha256-4e7937aa6e19df6c80dc0a7337f6999bf6b7a3c7ff512010903cd5d7e3961384"></a>
+
+### `"request"`
+
+SHA-256: `4e7937aa6e19df6c80dc0a7337f6999bf6b7a3c7ff512010903cd5d7e3961384`
+
+`"request"`
+
 <a id="persistence-type-sha256-70b082fe78991edf13cf66e1b4d06cd2dcff9cacfd76f8cfb996bfb61939e7b2"></a>
 
 ### `"request/context"`
@@ -2292,6 +2322,14 @@ SHA-256: `3e0eff5946255ff05d88a10839c60305135801f97794ea48d409f8503303317e`
 SHA-256: `5bd310104cfe448e530beb11422d2f791e2e32e8e95fdc528a15f9ca693dae75`
 
 `"resource-cost"`
+
+<a id="persistence-type-sha256-83384fda94a729ec2cecc6810be628cd2bbd98109834a9add38e61325431e837"></a>
+
+### `"result"`
+
+SHA-256: `83384fda94a729ec2cecc6810be628cd2bbd98109834a9add38e61325431e837`
+
+`"result"`
 
 <a id="persistence-type-sha256-34d1ab5c5df378186d6054b1a1beea9a41e41965d6f336f0bc0025c441a82e66"></a>
 
@@ -3859,6 +3897,27 @@ SHA-256: `6f72ece8f317cd080c4f20a93f1bf709965f5b81ac4669528f5a023191cfcf20`
 | `step` | 必需 | `number` |
 | `turn` | 必需 | `number` |
 
+<a id="persistence-type-sha256-535e95a4e47199451241eb4351b052b71c17afeebc732f74be89c3059e64c4b9"></a>
+
+<a id="persistence-type-memorycall"></a>
+
+<a id="persistence-type-packagesbundleweb-appsrcdublin-memory-runtimetsmemorycall"></a>
+
+### `MemoryCall`
+
+SHA-256: `535e95a4e47199451241eb4351b052b71c17afeebc732f74be89c3059e64c4b9`
+
+来源：[`packages/bundle/web-app/src/dublin-memory-runtime.ts:19`](../packages/bundle/web-app/src/dublin-memory-runtime.ts)
+
+| 属性 | 存在性 | 类型 |
+|---|---|---|
+| `input` | 必需 | `string` |
+| `model` | 必需 | `string` |
+| `output` | 必需 | `string` |
+| `phase` | 必需 | [`union (2 variants)`](#persistence-type-sha256-f204d1e11ddeec3d145ebbc55598518d633d724d456b9b72ee2b99bc438ae2e3) |
+| `provider` | 必需 | `string` |
+| `system` | 必需 | `string` |
+
 <a id="persistence-type-sha256-cb7b863ddb7b3eab5f18f216602feba25f47b456e73e4e72b6bcc259875c6dab"></a>
 
 <a id="persistence-type-message"></a>
@@ -5419,6 +5478,17 @@ SHA-256: `9947aa5938fe19a895298da412917acbf9ffb5093a73ab8baa257e6ae9e63a07`
 
 - [`{ compactionId, llmStreamCall, maxTokens?, model, … }`](#persistence-type-sha256-a99ec0993c62c058e50af9f68922202a3b54f5e259bc2abf1915a73381d2316d)
 - [`{ compactionId, maxTokens?, model, provider, … }`](#persistence-type-sha256-576a2de8355eb09850963ff5953420b172e274d9283666eb7d889097db120796)
+
+<a id="persistence-type-sha256-f204d1e11ddeec3d145ebbc55598518d633d724d456b9b72ee2b99bc438ae2e3"></a>
+
+### `union (2 variants)`
+
+SHA-256: `f204d1e11ddeec3d145ebbc55598518d633d724d456b9b72ee2b99bc438ae2e3`
+
+以下类型之一：
+
+- `"request"`
+- `"result"`
 
 <a id="persistence-type-sha256-5776e5553ff2dfe3f5bc202dbb1e7c9f93e35a531aebb7764c23b2b6153b2ccc"></a>
 
@@ -7913,6 +7983,22 @@ SHA-256: `186159f5f6f67a0b8cd095b8fe55bef42d4f25ca1a1c248f859867af2ece0467`
 | `surfaceOp` | 必需 | [`SurfaceOp`](#persistence-type-sha256-335e242de1fcc17b6ca920fc420d71bec2d76e53e37955c00948b65ab77f05c5) |
 | `time` | 必需 | `number` |
 | `type` | 必需 | `"developer/message"` |
+
+<a id="persistence-type-sha256-be9f6eb85db4e9722f82beefc713d43c25ab60d052a4b62410c2ff220b53e34a"></a>
+
+<a id="persistence-type-eventdublinmemory-call"></a>
+
+### `{ type: "dublin/memory-call" }`
+
+SHA-256: `be9f6eb85db4e9722f82beefc713d43c25ab60d052a4b62410c2ff220b53e34a`
+
+| 属性 | 存在性 | 类型 |
+|---|---|---|
+| `data` | 必需 | [`MemoryCall`](#persistence-type-sha256-535e95a4e47199451241eb4351b052b71c17afeebc732f74be89c3059e64c4b9) |
+| `ignorable` | 可选 | `true` |
+| `seq` | 必需 | `number` |
+| `time` | 必需 | `number` |
+| `type` | 必需 | `"dublin/memory-call"` |
 
 <a id="persistence-type-sha256-3ee93b06f3a125850337602bcdf155d2538c43a5c944ec55b1b3c365152d6796"></a>
 

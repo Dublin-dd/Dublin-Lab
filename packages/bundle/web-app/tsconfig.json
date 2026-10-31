@@ -8,7 +8,9 @@
     "src"
   ],
   "references": [
-    { "path": "../../schedule/schedule" },
+    {
+      "path": "../../schedule/schedule"
+    },
     {
       "path": "../../attachment/attachment"
     },
@@ -53,6 +55,18 @@
     },
     {
       "path": "../../core/agent"
+    },
+    {
+      "path": "../../llm/llm"
+    },
+    {
+      "path": "../../session-query/session-query"
+    },
+    {
+      "path": "../../credentials/credentials"
+    },
+    {
+      "path": "../../compaction/compaction"
     }
   ]
 }

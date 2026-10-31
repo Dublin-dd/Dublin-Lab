@@ -1,8 +1,9 @@
 /** Dublin workbench controls and GitHub operation labels. */
+import { memoryZh, memoryEn } from './memory-locales.ts'
 import { personalZh, personalEn } from './personal-tools-locales.ts'
 /** Chinese workbench customization labels. */
 export const dublinZh = {
-  ...personalZh,
+  ...personalZh, ...memoryZh,
   todayAgenda: '今日安排', todayAgendaHint: '未完成事项与接下来的提醒', todayManageTodos: '管理待办', todayManageReminders: '管理定时任务',
   todayNoReminders: '暂无待执行的提醒。可以在对话中告诉 AI 何时提醒你。', navigationRecords: '记录',
   appearanceSettings: '外观', appearanceSettingsHint: '设置工作台风格、背景图片和透明度。',
@@ -55,7 +56,7 @@ export const dublinZh = {
 }
 /** English labels with the same operation and appearance keys. */
 export const dublinEn: Record<keyof typeof dublinZh, string> = {
-  ...personalEn,
+  ...personalEn, ...memoryEn,
   todayAgenda: 'Your day', todayAgendaHint: 'Open tasks and upcoming reminders', todayManageTodos: 'Manage tasks', todayManageReminders: 'Manage reminders',
   todayNoReminders: 'No upcoming reminders. Tell the assistant when to remind you.', navigationRecords: 'Capture',
   appearanceSettings: 'Appearance', appearanceSettingsHint: 'Choose a workspace style, background image and transparency.',
